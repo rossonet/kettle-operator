@@ -1,23 +1,30 @@
 package net.rossonet.operator.model.cron.transformation;
 
-public class CronKettleTransformationSpec {
-	private Integer replicas;
-	private Integer version;
+import java.util.Arrays;
 
-	public Integer getReplicas() {
-		return replicas;
+import net.rossonet.operator.model.simple.transformation.KettleTransformationSpec;
+
+public class CronKettleTransformationSpec extends KettleTransformationSpec {
+
+	private String schedule = null;
+
+	public String getSchedule() {
+		return schedule;
 	}
 
-	public Integer getVersion() {
-		return version;
+	public void setSchedule(final String schedule) {
+		this.schedule = schedule;
 	}
 
-	public void setReplicas(final Integer replicas) {
-		this.replicas = replicas;
-	}
-
-	public void setVersion(final Integer version) {
-		this.version = version;
+	@Override
+	public String toString() {
+		return "CronKettleTransformationSpec [schedule=" + schedule + ", getImage()=" + getImage() + ", getParam()="
+				+ Arrays.toString(getParam()) + ", getDir()=" + getDir() + ", getExprep()=" + getExprep()
+				+ ", getFile()=" + getFile() + ", getLevel()=" + getLevel() + ", getListdir()=" + getListdir()
+				+ ", getListrep()=" + getListrep() + ", getListtrans()=" + getListtrans() + ", getLogfile()="
+				+ getLogfile() + ", getNorep()=" + getNorep() + ", getPass()=" + getPass() + ", getRep()=" + getRep()
+				+ ", getSafemode()=" + getSafemode() + ", getTrans()=" + getTrans() + ", getUser()=" + getUser()
+				+ ", getVersion()=" + getVersion() + "]";
 	}
 
 }

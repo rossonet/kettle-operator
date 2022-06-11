@@ -1,14 +1,7 @@
 package net.rossonet.operator.model.cron.transformation;
 
-public class CronKettleTransformationStatus {
-	private Integer readyReplicas = 0;
+import net.rossonet.operator.model.simple.transformation.KettleTransformationStatus;
 
-	public Integer getReadyReplicas() {
-		return readyReplicas;
-	}
-
-	public void setReadyReplicas(final Integer readyReplicas) {
-		this.readyReplicas = readyReplicas;
-	}
+public class CronKettleTransformationStatus extends KettleTransformationStatus {
 
 }

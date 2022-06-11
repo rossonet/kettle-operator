@@ -1,5 +1,7 @@
 package net.rossonet.operator.model.cron.job;
 
-public class CronKettleJobStatus {
+import net.rossonet.operator.model.simple.job.KettleJobStatus;
+
+public class CronKettleJobStatus extends KettleJobStatus {
 
 }

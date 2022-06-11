@@ -1,23 +1,27 @@
 package net.rossonet.operator.model.cron.job;
 
-public class CronKettleJobSpec {
-	private Integer replicas;
-	private Integer version;
+import net.rossonet.operator.model.simple.job.KettleJobSpec;
 
-	public Integer getReplicas() {
-		return replicas;
+public class CronKettleJobSpec extends KettleJobSpec {
+
+	private String schedule = null;
+
+	public String getSchedule() {
+		return schedule;
 	}
 
-	public Integer getVersion() {
-		return version;
+	public void setSchedule(final String schedule) {
+		this.schedule = schedule;
 	}
 
-	public void setReplicas(final Integer replicas) {
-		this.replicas = replicas;
-	}
-
-	public void setVersion(final Integer version) {
-		this.version = version;
+	@Override
+	public String toString() {
+		return "CronKettleJobSpec [schedule=" + schedule + ", getDir()=" + getDir() + ", getExport()=" + getExport()
+				+ ", getFile()=" + getFile() + ", getImage()=" + getImage() + ", getJob()=" + getJob() + ", getLevel()="
+				+ getLevel() + ", getListdir()=" + getListdir() + ", getListjob()=" + getListjob() + ", getListrep()="
+				+ getListrep() + ", getLogfile()=" + getLogfile() + ", getNorep()=" + getNorep() + ", getParam()="
+				+ getParam() + ", getRep()=" + getRep() + ", getUser()=" + getUser() + ", getVersion()=" + getVersion()
+				+ "]";
 	}
 
 }
