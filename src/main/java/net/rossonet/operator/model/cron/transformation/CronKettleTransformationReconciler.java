@@ -12,9 +12,10 @@ import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusHandler;
 import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusUpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.StaticUtils;
 
-@ControllerConfiguration
+@ControllerConfiguration(dependents = { @Dependent(type = SimpleCronTransformationResource.class) })
 public class CronKettleTransformationReconciler implements Reconciler<CronKettleTransformation>,
 		ErrorStatusHandler<CronKettleTransformation>, Cleaner<CronKettleTransformation> {
 	public static final String SELECTOR = "managed";
