@@ -10,9 +10,9 @@ public interface KettleWork extends HasMetadata {
 	public final String DEFAULT_IMAGE = "rossonet/kettle-runner:latest";
 
 	/**
-	 * • Set to true to suppress warnings. • Leave this option empty to view
-	 * warnings. Option to suppress warnings that the libwebkitgtk file is not
-	 * installed when launching the PDI client. You can:
+	 * Set to true to suppress warnings. Leave this option empty to view warnings.
+	 * Option to suppress warnings that the libwebkitgtk file is not installed when
+	 * launching the PDI client. You can:
 	 */
 	public String FILTER_GTK_WARNINGS = "";
 	/**
@@ -48,8 +48,7 @@ public interface KettleWork extends HasMetadata {
 	 */
 	public String PENTAHO_DI_JAVA_OPTIONS = "";
 	/**
-	 * • Set to true to suppress warnings. • Leave this option empty to view
-	 * warnings.
+	 * Set to true to suppress warnings. Leave this option empty to view warnings.
 	 */
 	public String SKIP_WEBKITGTK_CHECK = "";
 
