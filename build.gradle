@@ -1,0 +1,162 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://plugins.gradle.org/m2/" }
+  }
+  dependencies {
+    classpath "com.gorylenko.gradle-git-properties:gradle-git-properties:2.4.0"
+    classpath 'com.netflix.nebula:gradle-ospackage-plugin:8.4.1'
+    classpath 'de.undercouch:gradle-download-task:3.1.1'
+    classpath "com.palantir.gradle.docker:gradle-docker:0.32.0"
+    classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+  }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.palantir.docker'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: "com.gorylenko.gradle-git-properties"
+apply plugin: 'jacoco'
+apply plugin: 'base'
+apply plugin: 'signing'
+apply plugin: 'maven-publish'
+apply plugin: 'java-library'
+
+description = "Kubernetes Operator for Kettle"
+group = 'net.rossonet'
+version = '0.1'
+
+ext {
+  ossrhPassword = System.getenv('OSSRH_PASSWORD')
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  implementation group: 'io.javaoperatorsdk', name: 'operator-framework', version: '3.0.2'
+  annotationProcessor "io.javaoperatorsdk:operator-framework:3.0.2"
+  annotationProcessor 'io.fabric8:crd-generator-apt:5.12.2'
+  implementation 'org.takes:takes:1.20'
+  // testing
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+  testImplementation group: 'com.ginsberg', name: 'junit5-system-exit', version: '1.1.2'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+docker {
+  name "rossonet/kettle-operator:latest"
+  dockerfile file('Dockerfile.gradle')
+  files "$buildDir/libs/kettle-operator-${version}-all.jar"
+}
+
+task buildDocker() {
+  group "Operator Build"
+  description 'Build Docker image'
+  buildDocker.dependsOn("shadowJar")
+  buildDocker.finalizedBy("docker")
+}
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'net.rossonet.operator.KettleOperator'
+  }
+}
+
+test {
+  useJUnitPlatform()
+}
+
+eclipse {
+  classpath {
+    downloadJavadoc = true
+    downloadSources = true
+  }
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication){
+      artifactId = "${project.name}"
+      from components.java
+      versionMapping {
+        usage('java-api') {
+          fromResolutionOf('runtimeClasspath')
+        }
+        usage('java-runtime') {
+          fromResolutionResult()
+        }
+      }
+      pom {
+        name = 'Kettle Operator k8s'
+        description = 'Pentaho Kettle Kubernetes Operator'
+        url = 'https://www.rossonet.net/'
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+          }
+        }
+        developers {
+          developer {
+            id = 'ar4k'
+            name = 'Andrea Ambrosini'
+            email = 'andrea.ambrosini@rossonet.org'
+          }
+        }
+        scm {
+          connection = 'scm:git:git://github.com/rossonet/kettle-operator.git'
+          developerConnection = 'scm:git:ssh://github.com:rossonet/kettle-operator.git'
+          url = 'https://github.com/rossonet/kettle-operator/tree/master'
+        }
+      }
+    }
+  }
+  repositories {
+    maven {
+      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      name = "sonatype"
+      credentials {
+        username "rossonet"
+        password "${rootProject.ext.ossrhPassword}"
+      }
+    }
+  }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+gitProperties {
+  failOnNoGitDirectory = false
+  customProperty 'component', "${project.name}"
+  customProperty 'version', "${version}"
+  dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+  dateFormatTimeZone = 'GMT'
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled true
+    html.enabled false
+  }
+}
+
+shadowJar {
+  minimize()
+}
+
+javadoc{
+  destinationDir = file("${rootProject.buildDir}/docs/javadoc/${project.name}/")
+  failOnError=true
+}
