@@ -29,14 +29,14 @@ public class CronKettleTransformationReconciler implements Reconciler<CronKettle
 	@Override
 	public DeleteControl cleanup(final CronKettleTransformation resource,
 			final Context<CronKettleTransformation> context) {
-		logger.fine("cleanup  " + resource + " -> " + context);
+		logger.info("cleanup  " + resource + " -> " + context);
 		return DeleteControl.defaultDelete();
 	}
 
 	@Override
 	public UpdateControl<CronKettleTransformation> reconcile(final CronKettleTransformation resource,
 			final Context<CronKettleTransformation> context) throws Exception {
-		logger.fine("reconcile  " + resource + " -> " + context);
+		logger.info("reconcile  " + resource + " -> " + context);
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
 		resource.setStatus((CronKettleTransformationStatus) StaticUtils.createStatus(name));
 		return UpdateControl.patchStatus(resource);
@@ -46,7 +46,7 @@ public class CronKettleTransformationReconciler implements Reconciler<CronKettle
 	@Override
 	public ErrorStatusUpdateControl<CronKettleTransformation> updateErrorStatus(final CronKettleTransformation resource,
 			final Context<CronKettleTransformation> context, final Exception e) {
-		logger.fine("updateErrorStatus  " + resource + " -> " + context);
+		logger.info("updateErrorStatus  " + resource + " -> " + context);
 		return (ErrorStatusUpdateControl<CronKettleTransformation>) StaticUtils.handleError(resource, e);
 	}
 

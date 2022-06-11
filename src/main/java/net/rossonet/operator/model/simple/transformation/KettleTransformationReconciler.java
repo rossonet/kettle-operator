@@ -31,14 +31,14 @@ public class KettleTransformationReconciler implements Reconciler<KettleTransfor
 
 	@Override
 	public DeleteControl cleanup(final KettleTransformation resource, final Context<KettleTransformation> context) {
-		logger.fine("cleanup  " + resource + " -> " + context);
+		logger.info("cleanup  " + resource + " -> " + context);
 		return DeleteControl.defaultDelete();
 	}
 
 	@Override
 	public UpdateControl<KettleTransformation> reconcile(final KettleTransformation resource,
 			final Context<KettleTransformation> context) throws Exception {
-		logger.fine("reconcile  " + resource + " -> " + context);
+		logger.info("reconcile  " + resource + " -> " + context);
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
 		resource.setStatus((KettleTransformationStatus) StaticUtils.createStatus(name));
 		return UpdateControl.patchStatus(resource);
@@ -48,7 +48,7 @@ public class KettleTransformationReconciler implements Reconciler<KettleTransfor
 	@Override
 	public ErrorStatusUpdateControl<KettleTransformation> updateErrorStatus(final KettleTransformation resource,
 			final Context<KettleTransformation> context, final Exception e) {
-		logger.fine("updateErrorStatus  " + resource + " -> " + context);
+		logger.info("updateErrorStatus  " + resource + " -> " + context);
 		return (ErrorStatusUpdateControl<KettleTransformation>) StaticUtils.handleError(resource, e);
 	}
 }

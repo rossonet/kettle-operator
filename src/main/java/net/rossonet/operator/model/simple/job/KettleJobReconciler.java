@@ -28,14 +28,14 @@ public class KettleJobReconciler implements Reconciler<KettleJob>, ErrorStatusHa
 
 	@Override
 	public DeleteControl cleanup(final KettleJob resource, final Context<KettleJob> context) {
-		logger.fine("cleanup  " + resource + " -> " + context);
+		logger.info("cleanup  " + resource + " -> " + context);
 		return DeleteControl.defaultDelete();
 	}
 
 	@Override
 	public UpdateControl<KettleJob> reconcile(final KettleJob resource, final Context<KettleJob> context)
 			throws Exception {
-		logger.fine("reconcile  " + resource + " -> " + context);
+		logger.info("reconcile  " + resource + " -> " + context);
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
 		resource.setStatus((KettleJobStatus) StaticUtils.createStatus(name));
 		return UpdateControl.patchStatus(resource);
@@ -45,7 +45,7 @@ public class KettleJobReconciler implements Reconciler<KettleJob>, ErrorStatusHa
 	@Override
 	public ErrorStatusUpdateControl<KettleJob> updateErrorStatus(final KettleJob resource,
 			final Context<KettleJob> context, final Exception e) {
-		logger.fine("updateErrorStatus  " + resource + " -> " + context);
+		logger.info("updateErrorStatus  " + resource + " -> " + context);
 		return (ErrorStatusUpdateControl<KettleJob>) StaticUtils.handleError(resource, e);
 	}
 

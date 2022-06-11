@@ -1,5 +1,6 @@
 package net.rossonet.operator.model;
 
+import java.util.Arrays;
 import java.util.List;
 
 import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusUpdateControl;
@@ -14,17 +15,17 @@ public class StaticUtils {
 
 	public static List<String> createCronJobCommand(final CronKettleJob kettleJob) {
 		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList(new String[] { "uname -a" });
 	}
 
 	public static List<String> createCronTransformationCommand(final CronKettleTransformation kettleTransformation) {
 		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList(new String[] { "uname -a" });
 	}
 
 	public static List<String> createJobCommand(final KettleJob kettleJob) {
 		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList(new String[] { "uname -a" });
 	}
 
 	public static KettleStatus createStatus(final String name) {
@@ -34,7 +35,7 @@ public class StaticUtils {
 
 	public static List<String> createTransformationCommand(final KettleTransformation kettleTransformation) {
 		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList(new String[] { "uname -a" });
 	}
 
 	public static ErrorStatusUpdateControl<? extends KettleWork> handleError(final KettleWork resource,
