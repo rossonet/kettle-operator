@@ -11,11 +11,10 @@ import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusHandler;
 import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusUpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
-import net.rossonet.operator.model.simple.transformation.KettleTransformation;
 
 @ControllerConfiguration
-public class CronKettleTransformationReconciler implements Reconciler<KettleTransformation>,
-		ErrorStatusHandler<KettleTransformation>, Cleaner<KettleTransformation> {
+public class CronKettleTransformationReconciler implements Reconciler<CronKettleTransformation>,
+		ErrorStatusHandler<CronKettleTransformation>, Cleaner<CronKettleTransformation> {
 	private static final Logger logger = Logger.getLogger(CronKettleTransformationReconciler.class.getName());
 	private final KubernetesClient client;
 
@@ -24,23 +23,24 @@ public class CronKettleTransformationReconciler implements Reconciler<KettleTran
 	}
 
 	@Override
-	public DeleteControl cleanup(final KettleTransformation resource, final Context<KettleTransformation> context) {
+	public DeleteControl cleanup(final CronKettleTransformation resource,
+			final Context<CronKettleTransformation> context) {
 		// TODO Auto-generated method stub
 		logger.info("cleanup " + resource + " -> " + context);
 		return DeleteControl.defaultDelete();
 	}
 
 	@Override
-	public UpdateControl<KettleTransformation> reconcile(final KettleTransformation resource,
-			final Context<KettleTransformation> context) throws Exception {
+	public UpdateControl<CronKettleTransformation> reconcile(final CronKettleTransformation resource,
+			final Context<CronKettleTransformation> context) throws Exception {
 		// TODO Auto-generated method stub
 		logger.info("reconcile " + resource + " -> " + context);
 		return UpdateControl.noUpdate();
 	}
 
 	@Override
-	public ErrorStatusUpdateControl<KettleTransformation> updateErrorStatus(final KettleTransformation resource,
-			final Context<KettleTransformation> context, final Exception e) {
+	public ErrorStatusUpdateControl<CronKettleTransformation> updateErrorStatus(final CronKettleTransformation resource,
+			final Context<CronKettleTransformation> context, final Exception e) {
 		// TODO Auto-generated method stub
 		logger.info("updateErrorStatus " + resource + " -> " + context);
 		return ErrorStatusUpdateControl.noStatusUpdate();
