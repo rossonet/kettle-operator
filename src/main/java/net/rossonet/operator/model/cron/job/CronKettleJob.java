@@ -11,7 +11,7 @@ import io.fabric8.kubernetes.model.annotation.Version;
 
 @Group("kettle.rossonet.net")
 @Version("v1")
-@ShortNames("kettlecronjob")
+@ShortNames("kcj")
 public class CronKettleJob extends CustomResource<CronKettleJobSpec, CronKettleJobStatus> implements Namespaced {
 	private static final long serialVersionUID = 8849061516845526594L;
 

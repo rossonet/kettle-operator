@@ -108,7 +108,7 @@ spec:
     kind: KettleJob
     plural: kettlejobs
     shortNames:
-    - kettlejob
+    - kj
     singular: kettlejob
   scope: Namespaced
   versions:
@@ -142,7 +142,7 @@ spec:
     kind: KettleTransformation
     plural: kettletransformations
     shortNames:
-    - kettletran
+    - kt
     singular: kettletransformation
   scope: Namespaced
   versions:
@@ -178,7 +178,7 @@ spec:
     kind: CronKettleJob
     plural: cronkettlejobs
     shortNames:
-    - kettlecronjob
+    - kcj
     singular: cronkettlejob
   scope: Namespaced
   versions:
@@ -212,7 +212,7 @@ spec:
     kind: CronKettleTransformation
     plural: cronkettletransformations
     shortNames:
-    - kettlecrontran
+    - kct
     singular: cronkettletransformation
   scope: Namespaced
   versions:

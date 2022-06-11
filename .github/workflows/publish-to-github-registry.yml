@@ -26,10 +26,17 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push operator
         uses: docker/build-push-action@v2
         with:
           context: .
           platforms: linux/arm64,linux/amd64,linux/arm/v7
           push: true
           tags: ghcr.io/rossonet/kettle-operator:latest
+      - name: Build and push runner
+        uses: docker/build-push-action@v2
+        with:
+          context: ./kettle-runner
+          platforms: linux/arm64,linux/amd64,linux/arm/v7
+          push: true
+          tags: ghcr.io/rossonet/kettle-runner:latest

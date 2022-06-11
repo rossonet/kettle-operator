@@ -11,7 +11,7 @@ import io.fabric8.kubernetes.model.annotation.Version;
 
 @Group("kettle.rossonet.net")
 @Version("v1")
-@ShortNames("kettlecrontran")
+@ShortNames("kct")
 public class CronKettleTransformation
 		extends CustomResource<CronKettleTransformationSpec, CronKettleTransformationStatus> implements Namespaced {
 	private static final long serialVersionUID = 4345050362805262846L;
