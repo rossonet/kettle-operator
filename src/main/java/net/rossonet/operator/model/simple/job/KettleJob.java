@@ -8,12 +8,11 @@ import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.ShortNames;
 import io.fabric8.kubernetes.model.annotation.Version;
-import net.rossonet.operator.model.simple.KettleWork;
 
 @Group("kettle.rossonet.net")
 @Version("v1")
 @ShortNames("kj")
-public class KettleJob extends CustomResource<KettleJobSpec, KettleJobStatus> implements Namespaced, KettleWork {
+public class KettleJob extends CustomResource<KettleJobSpec, KettleJobStatus> implements Namespaced {
 	private static final long serialVersionUID = 3829302641057094803L;
 
 	@Override

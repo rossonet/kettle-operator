@@ -8,13 +8,12 @@ import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.ShortNames;
 import io.fabric8.kubernetes.model.annotation.Version;
-import net.rossonet.operator.model.simple.KettleWork;
 
 @Group("kettle.rossonet.net")
 @Version("v1")
 @ShortNames("kct")
-public class CronKettleTransformation extends
-		CustomResource<CronKettleTransformationSpec, CronKettleTransformationStatus> implements Namespaced, KettleWork {
+public class CronKettleTransformation
+		extends CustomResource<CronKettleTransformationSpec, CronKettleTransformationStatus> implements Namespaced {
 	private static final long serialVersionUID = 4345050362805262846L;
 
 	@Override

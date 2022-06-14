@@ -1,8 +1,6 @@
 package net.rossonet.operator.model.simple.transformation;
 
-import net.rossonet.operator.model.simple.KettleStatus;
-
-public class KettleTransformationStatus implements KettleStatus {
+public class KettleTransformationStatus {
 
 	private String errorMessage = null;
 
