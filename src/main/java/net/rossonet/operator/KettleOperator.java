@@ -87,10 +87,10 @@ public class KettleOperator {
 		final Config config = new ConfigBuilder().withNamespace(null).build();
 		final KubernetesClient client = new DefaultKubernetesClient(config);
 		final Operator operator = new Operator(client);
-		operator.register(new KettleJobReconciler(client));
-		operator.register(new KettleTransformationReconciler(client));
-		operator.register(new CronKettleJobReconciler(client));
-		operator.register(new CronKettleTransformationReconciler(client));
+		operator.register(new KettleJobReconciler());
+		operator.register(new KettleTransformationReconciler());
+		operator.register(new CronKettleJobReconciler());
+		operator.register(new CronKettleTransformationReconciler());
 		operator.installShutdownHook();
 		operator.start();
 		new FtBasic(new TkFork(new FkRegex("/health", "ALL GOOD.")), 8080).start(Exit.NEVER);

@@ -3,35 +3,17 @@ package net.rossonet.operator.model.cron.job;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
-import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
-import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusHandler;
-import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusUpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleCronJobResource.class) })
-public class CronKettleJobReconciler
-		implements Reconciler<CronKettleJob>, ErrorStatusHandler<CronKettleJob>, Cleaner<CronKettleJob> {
-	public static final String SELECTOR = "managed";
+public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 	private static final Logger logger = Logger.getLogger(CronKettleJobReconciler.class.getName());
-	@SuppressWarnings("unused")
-	private final KubernetesClient client;
-
-	public CronKettleJobReconciler(final KubernetesClient client) {
-		this.client = client;
-	}
-
-	@Override
-	public DeleteControl cleanup(final CronKettleJob resource, final Context<CronKettleJob> context) {
-		logger.info("cleanup  " + resource + " -> " + context);
-		return DeleteControl.defaultDelete();
-	}
+	public static final String SELECTOR = "managed";
 
 	@Override
 	public UpdateControl<CronKettleJob> reconcile(final CronKettleJob resource, final Context<CronKettleJob> context)
@@ -40,14 +22,6 @@ public class CronKettleJobReconciler
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
 		resource.setStatus((CronKettleJobStatus) StaticUtils.createStatus(name));
 		return UpdateControl.patchStatus(resource);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public ErrorStatusUpdateControl<CronKettleJob> updateErrorStatus(final CronKettleJob resource,
-			final Context<CronKettleJob> context, final Exception e) {
-		logger.info("updateErrorStatus  " + resource + " -> " + context);
-		return (ErrorStatusUpdateControl<CronKettleJob>) StaticUtils.handleError(resource, e);
 	}
 
 }
