@@ -13,8 +13,8 @@ import net.rossonet.operator.model.StaticUtils;
 @KubernetesDependent(labelSelector = KettleJobReconciler.SELECTOR)
 public class SimpleJobResource extends CRUKubernetesDependentResource<Job, KettleJob> {
 
-	public SimpleJobResource(final Class<Job> resource) {
-		super(resource);
+	public SimpleJobResource() {
+		super(Job.class);
 	}
 
 	@Override

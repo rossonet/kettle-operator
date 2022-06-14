@@ -14,7 +14,7 @@ import net.rossonet.operator.model.StaticUtils;
 public class SimpleTransformationResource extends CRUKubernetesDependentResource<Job, KettleTransformation> {
 
 	public SimpleTransformationResource(final Class<Job> resource) {
-		super(resource);
+		super(Job.class);
 	}
 
 	@Override

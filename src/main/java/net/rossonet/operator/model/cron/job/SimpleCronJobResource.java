@@ -13,8 +13,8 @@ import net.rossonet.operator.model.StaticUtils;
 @KubernetesDependent(labelSelector = CronKettleJobReconciler.SELECTOR)
 public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJob, CronKettleJob> {
 
-	public SimpleCronJobResource(final Class<CronJob> resource) {
-		super(resource);
+	public SimpleCronJobResource() {
+		super(CronJob.class);
 	}
 
 	@Override

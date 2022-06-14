@@ -14,8 +14,8 @@ import net.rossonet.operator.model.StaticUtils;
 public class SimpleCronTransformationResource
 		extends CRUKubernetesDependentResource<CronJob, CronKettleTransformation> {
 
-	public SimpleCronTransformationResource(final Class<CronJob> resource) {
-		super(resource);
+	public SimpleCronTransformationResource() {
+		super(CronJob.class);
 	}
 
 	@Override
