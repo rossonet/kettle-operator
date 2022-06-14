@@ -3,45 +3,55 @@ package net.rossonet.operator.model;
 import java.util.Arrays;
 import java.util.List;
 
-import io.javaoperatorsdk.operator.api.reconciler.ErrorStatusUpdateControl;
 import net.rossonet.operator.model.cron.job.CronKettleJob;
+import net.rossonet.operator.model.cron.job.CronKettleJobStatus;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformation;
-import net.rossonet.operator.model.simple.KettleStatus;
-import net.rossonet.operator.model.simple.KettleWork;
+import net.rossonet.operator.model.cron.transformation.CronKettleTransformationStatus;
 import net.rossonet.operator.model.simple.job.KettleJob;
+import net.rossonet.operator.model.simple.job.KettleJobStatus;
 import net.rossonet.operator.model.simple.transformation.KettleTransformation;
+import net.rossonet.operator.model.simple.transformation.KettleTransformationStatus;
 
 public class StaticUtils {
 
 	public static List<String> createCronJobCommand(final CronKettleJob kettleJob) {
-		// TODO Auto-generated method stub
+		// TODO implementare logica
 		return Arrays.asList(new String[] { "uname -a" });
 	}
 
+	public static CronKettleJobStatus createCronKettleJobStatus(final String name) {
+		// TODO implementare logica
+		return new CronKettleJobStatus();
+	}
+
+	public static CronKettleTransformationStatus createCronKettleTransformationStatus(final String name) {
+		// TODO implementare logica
+		return new CronKettleTransformationStatus();
+	}
+
 	public static List<String> createCronTransformationCommand(final CronKettleTransformation kettleTransformation) {
-		// TODO Auto-generated method stub
+		// TODO implementare logica
 		return Arrays.asList(new String[] { "uname -a" });
 	}
 
 	public static List<String> createJobCommand(final KettleJob kettleJob) {
-		// TODO Auto-generated method stub
+		// TODO implementare logica
 		return Arrays.asList(new String[] { "uname -a" });
 	}
 
-	public static KettleStatus createStatus(final String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public static KettleJobStatus createKettleJobStatus(final String name) {
+		// TODO implementare logica
+		return new KettleJobStatus();
+	}
+
+	public static KettleTransformationStatus createKettleTransformationStatus(final String name) {
+		// TODO implementare logica
+		return new KettleTransformationStatus();
 	}
 
 	public static List<String> createTransformationCommand(final KettleTransformation kettleTransformation) {
-		// TODO Auto-generated method stub
+		// TODO implementare logica
 		return Arrays.asList(new String[] { "uname -a" });
-	}
-
-	public static ErrorStatusUpdateControl<? extends KettleWork> handleError(final KettleWork resource,
-			final Exception e) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private StaticUtils() {

@@ -12,15 +12,15 @@ import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleCronJobResource.class) })
 public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
-	private static final Logger logger = Logger.getLogger(CronKettleJobReconciler.class.getName());
 	public static final String SELECTOR = "managed";
+	private static final Logger logger = Logger.getLogger(CronKettleJobReconciler.class.getName());
 
 	@Override
 	public UpdateControl<CronKettleJob> reconcile(final CronKettleJob resource, final Context<CronKettleJob> context)
 			throws Exception {
 		logger.info("reconcile  " + resource + " -> " + context);
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
-		resource.setStatus((CronKettleJobStatus) StaticUtils.createStatus(name));
+		resource.setStatus(StaticUtils.createCronKettleJobStatus(name));
 		return UpdateControl.patchStatus(resource);
 	}
 

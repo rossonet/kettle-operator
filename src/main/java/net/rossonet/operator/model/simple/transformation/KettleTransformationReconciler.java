@@ -12,16 +12,16 @@ import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleTransformationResource.class) })
 public class KettleTransformationReconciler implements Reconciler<KettleTransformation> {
-	private static final Logger logger = Logger.getLogger(KettleTransformationReconciler.class.getName());
-
 	public static final String SELECTOR = "managed";
+
+	private static final Logger logger = Logger.getLogger(KettleTransformationReconciler.class.getName());
 
 	@Override
 	public UpdateControl<KettleTransformation> reconcile(final KettleTransformation resource,
 			final Context<KettleTransformation> context) throws Exception {
 		logger.info("reconcile  " + resource + " -> " + context);
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
-		resource.setStatus((KettleTransformationStatus) StaticUtils.createStatus(name));
+		resource.setStatus(StaticUtils.createKettleTransformationStatus(name));
 		return UpdateControl.patchStatus(resource);
 	}
 

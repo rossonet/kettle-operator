@@ -12,15 +12,15 @@ import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleJobResource.class) })
 public class KettleJobReconciler implements Reconciler<KettleJob> {
-	private static final Logger logger = Logger.getLogger(KettleJobReconciler.class.getName());
 	public static final String SELECTOR = "managed";
+	private static final Logger logger = Logger.getLogger(KettleJobReconciler.class.getName());
 
 	@Override
 	public UpdateControl<KettleJob> reconcile(final KettleJob resource, final Context<KettleJob> context)
 			throws Exception {
 		logger.info("reconcile  " + resource + " -> " + context);
 		final String name = context.getSecondaryResource(ConfigMap.class).get().getMetadata().getName();
-		resource.setStatus((KettleJobStatus) StaticUtils.createStatus(name));
+		resource.setStatus(StaticUtils.createKettleJobStatus(name));
 		return UpdateControl.patchStatus(resource);
 	}
 
