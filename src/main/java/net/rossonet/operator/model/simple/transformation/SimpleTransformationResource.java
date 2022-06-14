@@ -13,7 +13,7 @@ import net.rossonet.operator.model.StaticUtils;
 @KubernetesDependent(labelSelector = KettleTransformationReconciler.SELECTOR)
 public class SimpleTransformationResource extends CRUKubernetesDependentResource<Job, KettleTransformation> {
 
-	public SimpleTransformationResource(final Class<Job> resource) {
+	public SimpleTransformationResource() {
 		super(Job.class);
 	}
 
