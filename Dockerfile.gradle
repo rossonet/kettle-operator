@@ -1,5 +1,4 @@
 FROM openjdk:8-jdk-alpine
-MAINTAINER Ar4k - Rossonet <andrea.ambrosini@rossonet.com>
 RUN apk add --no-cache bash gawk sed grep bc coreutils wget binutils
 COPY *-all.jar operator.jar
 ENTRYPOINT ["java"]

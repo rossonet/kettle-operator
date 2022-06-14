@@ -1,6 +1,6 @@
 # Pentaho Kettle Operator by Rossonet
 
-## Kubernetes Operator.
+## Kubernetes Operator
 
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/rossonet/kettle-operator)
 [![Test on master branch with Gradle](https://github.com/rossonet/kettle-operator/actions/workflows/test-on-master-with-gradle.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/test-on-master-with-gradle.yml)
