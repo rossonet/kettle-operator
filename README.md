@@ -10,6 +10,11 @@
 
 ## Rossonet
 
+### Framework
+
+[https://javaoperatorsdk.io/](https://javaoperatorsdk.io/)
+[examples](https://github.com/java-operator-sdk/java-operator-sdk/tree/main/sample-operators)
+
 ### install on Kubernetes
 
 ```

@@ -2,7 +2,7 @@ apiVersion: kettle.rossonet.net/v1
 kind: KettleTransformation
 metadata:
   name: trasformation-example1
-  namespace: kettle-operator
+  namespace: test-namespace
 spec:
   dir: dir-value
   exprep: exprep-value
@@ -14,7 +14,6 @@ spec:
   listtrans: listtrans-value
   logfile: logfile-value
   norep: norep-value
-  param: ["par1=0","par2=2"]
   pass: pass-value
   rep: rep-value
   safemode: savemode-value
