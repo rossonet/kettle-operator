@@ -1,6 +1,7 @@
 package net.rossonet.operator.model.cron.job;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodSpec;
@@ -12,9 +13,11 @@ import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = CronKettleJobReconciler.SELECTOR)
 public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJob, CronKettleJob> {
+	private static final Logger logger = Logger.getLogger(SimpleCronJobResource.class.getName());
 
 	public SimpleCronJobResource() {
 		super(CronJob.class);
+		logger.info("Job created");
 	}
 
 	@Override
@@ -29,6 +32,7 @@ public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJo
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(jobDetails);
 		job.getSpec().setSchedule(kettleJob.getSpec().getSchedule());
+		logger.info("desired cronjob " + job);
 		return job;
 	}
 

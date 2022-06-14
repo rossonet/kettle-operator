@@ -1,6 +1,7 @@
 package net.rossonet.operator.model.simple.job;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodSpec;
@@ -12,9 +13,11 @@ import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = KettleJobReconciler.SELECTOR)
 public class SimpleJobResource extends CRUKubernetesDependentResource<Job, KettleJob> {
+	private static final Logger logger = Logger.getLogger(SimpleJobResource.class.getName());
 
 	public SimpleJobResource() {
 		super(Job.class);
+		logger.info("Job created");
 	}
 
 	@Override
@@ -28,6 +31,7 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 		container.setCommand(StaticUtils.createJobCommand(kettleJob));
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getTemplate().setSpec(jobDetails);
+		logger.info("desired job " + job);
 		return job;
 	}
 

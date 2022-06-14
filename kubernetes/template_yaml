@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kettle-operator
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kettle-operator
+  namespace: kettle-operator
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kettle-operator
+  namespace: kettle-operator
+spec:
+  selector:
+    matchLabels:
+      app: kettle-operator
+  template:
+    metadata:
+      labels:
+        app: kettle-operator
+    spec:
+      serviceAccountName: kettle-operator
+      containers:
+      - name: operator
+        image: rossonet/kettle-operator:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kettle-operator-admin
+subjects:
+- kind: ServiceAccount
+  name: kettle-operator
+  namespace: kettle-operator
+roleRef:
+  kind: ClusterRole
+  name: kettle-operator
+  apiGroup: ""
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kettle-operator
+rules:
+- apiGroups:
+  - ""
+  - "extensions"
+  - "apps"
+  - "batch"
+  resources:
+  - deployments
+  - services
+  - pods
+  - pods/exec
+  - jobs
+  - cronjobs
+  verbs:
+  - '*'
+- apiGroups:
+  - "apiextensions.k8s.io"
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - '*'
+- apiGroups:
+  - "kettle.rossonet.net"
+  resources:
+  - kettlejobs
+  - kettlejobs/status
+  - kettletransformations
+  - kettletransformations/status
+  - cronkettletransformations
+  - cronkettletransformations/status
+  - cronkettlejobs
+  - cronkettlejobs/status
+  verbs:
+  - '*'
+---

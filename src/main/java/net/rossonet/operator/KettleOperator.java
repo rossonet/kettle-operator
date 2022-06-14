@@ -83,9 +83,10 @@ public class KettleOperator {
 	private static final Logger logger = Logger.getLogger(KettleOperator.class.getName());
 
 	public static void main(final String[] args) throws IOException {
-		logger.info("operator started");
+		logger.info("operator init");
 		final Config config = new ConfigBuilder().withNamespace(null).build();
 		final KubernetesClient client = new DefaultKubernetesClient(config);
+		// client.load(new FileInputStream("test.yaml")).get();
 		final Operator operator = new Operator(client);
 		operator.register(new KettleJobReconciler());
 		operator.register(new KettleTransformationReconciler());
@@ -93,6 +94,7 @@ public class KettleOperator {
 		operator.register(new CronKettleTransformationReconciler());
 		operator.installShutdownHook();
 		operator.start();
+		logger.info("operator started");
 		new FtBasic(new TkFork(new FkRegex("/health", "ALL GOOD.")), 8080).start(Exit.NEVER);
 	}
 

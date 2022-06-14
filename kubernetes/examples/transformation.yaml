@@ -4,21 +4,21 @@ metadata:
   name: trasformation-example1
   namespace: test-namespace
 spec:
-  #dir: dir-value
-  #exprep: exprep-value
-  #file:	file-value
+  dir: dir-value
+  exprep: exprep-value
+  file:	file-value
   #image: image-value
-  #level: level-value
-  #listdir: listdir-value 
-  #listrep: listrep-value
-  #listtrans: listtrans-value
-  #logfile: logfile-value
-  #norep: norep-value
-  #pass: pass-value
-  #param: ["par1=0","par2=ciao"]
-  #rep: rep-value
-  #safemode: savemode-value
-  #trans: trans-value
-  #user:	user-value
-  #version: version-value
+  level: level-value
+  listdir: listdir-value 
+  listrep: listrep-value
+  listtrans: listtrans-value
+  logfile: logfile-value
+  norep: norep-value
+  pass: pass-value
+  param: ["par1=0","par2=ciao","terzo=1"]
+  rep: rep-value
+  safemode: savemode-value
+  trans: trans-value
+  user:	user-value
+  version: version-value
 

@@ -1,6 +1,7 @@
 package net.rossonet.operator.model.simple.transformation;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodSpec;
@@ -12,9 +13,11 @@ import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = KettleTransformationReconciler.SELECTOR)
 public class SimpleTransformationResource extends CRUKubernetesDependentResource<Job, KettleTransformation> {
+	private static final Logger logger = Logger.getLogger(SimpleTransformationResource.class.getName());
 
 	public SimpleTransformationResource() {
 		super(Job.class);
+		logger.info("Job created");
 	}
 
 	@Override
@@ -29,6 +32,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 		container.setCommand(StaticUtils.createTransformationCommand(kettleTransformation));
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getTemplate().setSpec(jobDetails);
+		logger.info("desired job " + job);
 		return job;
 	}
 
