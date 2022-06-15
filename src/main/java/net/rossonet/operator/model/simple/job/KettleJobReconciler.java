@@ -3,6 +3,8 @@ package net.rossonet.operator.model.simple.job;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
@@ -14,6 +16,16 @@ import net.rossonet.operator.model.StaticUtils;
 public class KettleJobReconciler implements Reconciler<KettleJob> {
 	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 	private static final Logger logger = Logger.getLogger(KettleJobReconciler.class.getName());
+
+	private final KubernetesClient kubernetesClient;
+
+	public KettleJobReconciler() {
+		this(new DefaultKubernetesClient());
+	}
+
+	public KettleJobReconciler(final KubernetesClient kubernetesClient) {
+		this.kubernetesClient = kubernetesClient;
+	}
 
 	@Override
 	public UpdateControl<KettleJob> reconcile(final KettleJob resource, final Context<KettleJob> context)

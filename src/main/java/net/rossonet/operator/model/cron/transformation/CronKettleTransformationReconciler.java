@@ -3,6 +3,8 @@ package net.rossonet.operator.model.cron.transformation;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
@@ -14,6 +16,16 @@ import net.rossonet.operator.model.StaticUtils;
 public class CronKettleTransformationReconciler implements Reconciler<CronKettleTransformation> {
 	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 	private static final Logger logger = Logger.getLogger(CronKettleTransformationReconciler.class.getName());
+
+	private final KubernetesClient kubernetesClient;
+
+	public CronKettleTransformationReconciler() {
+		this(new DefaultKubernetesClient());
+	}
+
+	public CronKettleTransformationReconciler(final KubernetesClient kubernetesClient) {
+		this.kubernetesClient = kubernetesClient;
+	}
 
 	@Override
 	public UpdateControl<CronKettleTransformation> reconcile(final CronKettleTransformation resource,

@@ -128,10 +128,10 @@ public class KettleOperator {
 	}
 
 	public static void main(final String[] args) throws IOException {
-		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+		// System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
 		logger.info("operator init");
 		try {
-			changeLogLevel("all");
+			changeLogLevel("info");
 		} catch (final ConfigurationException e) {
 			logger.warning("Exception: " + e.getMessage());
 		}

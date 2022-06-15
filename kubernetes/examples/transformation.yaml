@@ -13,12 +13,12 @@ spec:
   listrep: listrep-value
   listtrans: listtrans-value
   logfile: logfile-value
-  norep: norep-value
-  pass: pass-value
-  param: ["par1=0","par2=ciao","terzo=1"]
+  norep: norep-value1
+  pass: pass-value3
+  param: ["pir1=0","par2=ciao","terzo=1"]
   rep: rep-value
-  safemode: savemode-value
-  trans: trans-value
+  safemode: savemode-value2
+  trans: trans-value2
   user:	user-value
   version: version-value
 
