@@ -1,7 +1,11 @@
 package net.rossonet.operator;
 
 import java.io.IOException;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.naming.ConfigurationException;
 
 import org.takes.facets.fork.FkRegex;
 import org.takes.facets.fork.TkFork;
@@ -82,8 +86,55 @@ public class KettleOperator {
 
 	private static final Logger logger = Logger.getLogger(KettleOperator.class.getName());
 
+	public static void changeLogLevel(final String logLevel) throws ConfigurationException {
+		final Logger rootLogger = Logger.getLogger("");
+		Level targetLevel = Level.INFO;
+		switch (logLevel) {
+		case "all":
+			targetLevel = Level.ALL;
+			break;
+		case "config":
+			targetLevel = Level.CONFIG;
+			break;
+		case "fine":
+			targetLevel = Level.FINE;
+			break;
+		case "finer":
+			targetLevel = Level.FINER;
+			break;
+		case "finest":
+			targetLevel = Level.FINEST;
+			break;
+		case "info":
+			targetLevel = Level.INFO;
+			break;
+		case "off":
+			targetLevel = Level.OFF;
+			break;
+		case "severe":
+			targetLevel = Level.SEVERE;
+			break;
+		case "warning":
+			targetLevel = Level.WARNING;
+			break;
+		default:
+			throw new ConfigurationException("log level " + logLevel
+					+ " not exists. You can use: all, config, fine, finer, finest, info, off, severe or warning");
+		}
+		rootLogger.setLevel(targetLevel);
+		for (final Handler handler : rootLogger.getHandlers()) {
+			handler.setLevel(targetLevel);
+		}
+	}
+
 	public static void main(final String[] args) throws IOException {
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
 		logger.info("operator init");
+		try {
+			changeLogLevel("all");
+		} catch (final ConfigurationException e) {
+			logger.warning("Exception: " + e.getMessage());
+		}
 		final Config config = new ConfigBuilder().withNamespace(null).build();
 		final KubernetesClient client = new DefaultKubernetesClient(config);
 		// client.load(new FileInputStream("test.yaml")).get();
