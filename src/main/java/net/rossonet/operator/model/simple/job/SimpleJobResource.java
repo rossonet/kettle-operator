@@ -15,14 +15,13 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 
 	public SimpleJobResource() {
 		super(Job.class);
-		logger.info("Job created");
+		logger.info("Job class created");
 	}
 
 	@Override
 	protected Job desired(final KettleJob kettleJob, final Context<KettleJob> context) {
 		final Job job = new Job();
 		logger.info("kettle job " + kettleJob);
-		logger.info("actual job " + job);
 		job.getMetadata().setName(kettleJob.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();
@@ -31,6 +30,7 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 		container.setCommand(StaticUtils.createJobCommand(kettleJob));
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getTemplate().setSpec(jobDetails);
+		logger.info("actual job " + job);
 		return job;
 	}
 

@@ -15,7 +15,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 
 	public SimpleTransformationResource() {
 		super(Job.class);
-		logger.info("Job created");
+		logger.info("Job class created");
 	}
 
 	@Override
@@ -23,7 +23,6 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			final Context<KettleTransformation> context) {
 		final Job job = new Job();
 		logger.info("kettle transformation " + kettleTransformation);
-		logger.info("actual job " + job);
 		job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();
@@ -32,6 +31,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 		container.setCommand(StaticUtils.createTransformationCommand(kettleTransformation));
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getTemplate().setSpec(jobDetails);
+		logger.info("actual job " + job);
 		return job;
 	}
 

@@ -16,7 +16,7 @@ public class SimpleCronTransformationResource
 
 	public SimpleCronTransformationResource() {
 		super(CronJob.class);
-		logger.info("CronJob created");
+		logger.info("CronJob class created");
 	}
 
 	@Override
@@ -24,7 +24,6 @@ public class SimpleCronTransformationResource
 			final Context<CronKettleTransformation> context) {
 		final CronJob job = new CronJob();
 		logger.info("kettle transformation " + kettleTransformation);
-		logger.info("actual cronjob " + job);
 		job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();
@@ -34,6 +33,7 @@ public class SimpleCronTransformationResource
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(jobDetails);
 		job.getSpec().setSchedule(kettleTransformation.getSpec().getSchedule());
+		logger.info("actual cronjob " + job);
 		return job;
 	}
 

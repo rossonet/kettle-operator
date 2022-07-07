@@ -15,14 +15,13 @@ public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJo
 
 	public SimpleCronJobResource() {
 		super(CronJob.class);
-		logger.info("CronJob created");
+		logger.info("CronJob class created");
 	}
 
 	@Override
 	protected CronJob desired(final CronKettleJob kettleJob, final Context<CronKettleJob> context) {
 		final CronJob job = new CronJob();
 		logger.info("kettle job " + kettleJob);
-		logger.info("actual cronjob " + job);
 		job.getMetadata().setName(kettleJob.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();
@@ -32,6 +31,7 @@ public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJo
 		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 		job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(jobDetails);
 		job.getSpec().setSchedule(kettleJob.getSpec().getSchedule());
+		logger.info("actual cronjob " + job);
 		return job;
 	}
 
