@@ -23,7 +23,8 @@ public class SimpleCronTransformationResource
 	protected CronJob desired(final CronKettleTransformation kettleTransformation,
 			final Context<CronKettleTransformation> context) {
 		final CronJob job = new CronJob();
-		logger.info("desired cronjob " + job);
+		logger.info("kettle transformation " + kettleTransformation);
+		logger.info("actual cronjob " + job);
 		job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();

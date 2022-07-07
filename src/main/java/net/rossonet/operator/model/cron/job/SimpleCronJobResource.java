@@ -21,7 +21,8 @@ public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJo
 	@Override
 	protected CronJob desired(final CronKettleJob kettleJob, final Context<CronKettleJob> context) {
 		final CronJob job = new CronJob();
-		logger.info("desired cronjob " + job);
+		logger.info("kettle job " + kettleJob);
+		logger.info("actual cronjob " + job);
 		job.getMetadata().setName(kettleJob.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();

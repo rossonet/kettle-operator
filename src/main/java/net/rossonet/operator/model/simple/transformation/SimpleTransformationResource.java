@@ -22,7 +22,8 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 	protected Job desired(final KettleTransformation kettleTransformation,
 			final Context<KettleTransformation> context) {
 		final Job job = new Job();
-		logger.info("desired job " + job);
+		logger.info("kettle transformation " + kettleTransformation);
+		logger.info("actual job " + job);
 		job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 		job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 		final PodSpec jobDetails = new PodSpec();
