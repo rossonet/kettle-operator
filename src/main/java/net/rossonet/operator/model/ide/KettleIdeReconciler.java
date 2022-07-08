@@ -1,8 +1,8 @@
-package net.rossonet.operator.model.simple.job;
+package net.rossonet.operator.model.ide;
 
 import java.util.logging.Logger;
 
-import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -13,28 +13,30 @@ import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
-@ControllerConfiguration(dependents = { @Dependent(type = SimpleJobResource.class) })
-public class KettleJobReconciler implements Reconciler<KettleJob> {
-	private static final Logger logger = Logger.getLogger(KettleJobReconciler.class.getName());
+@ControllerConfiguration(dependents = { @Dependent(type = IdeResource.class),
+		@Dependent(type = ServiceIdeResource.class), @Dependent(type = IngressIdeResource.class) })
+public class KettleIdeReconciler implements Reconciler<KettleIde> {
+	private static final Logger logger = Logger.getLogger(KettleIdeReconciler.class.getName());
+
 	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 
 	@SuppressWarnings("unused")
 	private final KubernetesClient kubernetesClient;
 
-	public KettleJobReconciler() {
+	public KettleIdeReconciler() {
 		this(new DefaultKubernetesClient());
 	}
 
-	public KettleJobReconciler(final KubernetesClient kubernetesClient) {
+	public KettleIdeReconciler(final KubernetesClient kubernetesClient) {
 		this.kubernetesClient = kubernetesClient;
 	}
 
 	@Override
-	public UpdateControl<KettleJob> reconcile(final KettleJob resource, final Context<KettleJob> context) {
+	public UpdateControl<KettleIde> reconcile(final KettleIde resource, final Context<KettleIde> context) {
 		try {
 			logger.info("reconciler  " + resource + " -> " + context);
-			final String name = context.getSecondaryResource(Job.class).get().getMetadata().getName();
-			resource.setStatus(StaticUtils.createKettleJobStatus(name));
+			final String name = context.getSecondaryResource(Deployment.class).get().getMetadata().getName();
+			resource.setStatus(StaticUtils.createKettleIdeStatus(name));
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));

@@ -15,7 +15,7 @@ spec:
   logfile: logfile-value
   norep: norep-value1
   pass: pass-value3
-  param: ["pir1=120","par2=ciao","terzo=1"]
+  param: ["pir1=120","par2=ciao","terzo=10"]
   rep: rep-value
   safemode: savemode-value2
   trans: trans-value2

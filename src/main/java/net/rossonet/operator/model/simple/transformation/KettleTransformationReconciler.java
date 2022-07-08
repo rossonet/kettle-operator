@@ -19,6 +19,7 @@ public class KettleTransformationReconciler implements Reconciler<KettleTransfor
 
 	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 
+	@SuppressWarnings("unused")
 	private final KubernetesClient kubernetesClient;
 
 	public KettleTransformationReconciler() {

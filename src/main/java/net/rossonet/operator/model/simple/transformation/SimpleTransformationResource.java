@@ -11,9 +11,11 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
+import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
 import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
+@KubernetesDependent(labelSelector = KettleTransformationReconciler.SELECTOR)
 public class SimpleTransformationResource extends CRUKubernetesDependentResource<Job, KettleTransformation> {
 	private static final Logger logger = Logger.getLogger(SimpleTransformationResource.class.getName());
 

@@ -18,6 +18,7 @@ public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 	private static final Logger logger = Logger.getLogger(CronKettleJobReconciler.class.getName());
 	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 
+	@SuppressWarnings("unused")
 	private final KubernetesClient kubernetesClient;
 
 	public CronKettleJobReconciler() {
