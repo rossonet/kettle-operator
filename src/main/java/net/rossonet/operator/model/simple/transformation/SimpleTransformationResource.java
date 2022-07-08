@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -25,6 +26,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 		final Job job = new Job();
 		try {
 			logger.info("kettle transformation " + kettleTransformation);
+			job.setMetadata(new ObjectMeta());
 			job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 			job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 			final PodSpec jobDetails = new PodSpec();

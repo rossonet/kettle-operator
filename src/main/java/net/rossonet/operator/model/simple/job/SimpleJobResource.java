@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -24,6 +25,7 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 		final Job job = new Job();
 		try {
 			logger.info("kettle job " + kettleJob);
+			job.setMetadata(new ObjectMeta());
 			job.getMetadata().setName(kettleJob.getMetadata().getName());
 			job.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
 			final PodSpec jobDetails = new PodSpec();
