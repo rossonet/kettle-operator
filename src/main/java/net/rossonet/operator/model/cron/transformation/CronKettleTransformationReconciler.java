@@ -10,12 +10,13 @@ import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
+import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleCronTransformationResource.class) })
 public class CronKettleTransformationReconciler implements Reconciler<CronKettleTransformation> {
-	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 	private static final Logger logger = Logger.getLogger(CronKettleTransformationReconciler.class.getName());
+	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 
 	private final KubernetesClient kubernetesClient;
 
@@ -29,11 +30,16 @@ public class CronKettleTransformationReconciler implements Reconciler<CronKettle
 
 	@Override
 	public UpdateControl<CronKettleTransformation> reconcile(final CronKettleTransformation resource,
-			final Context<CronKettleTransformation> context) throws Exception {
-		logger.info("reconciler  " + resource + " -> " + context);
-		final String name = context.getSecondaryResource(CronJob.class).get().getMetadata().getName();
-		resource.setStatus(StaticUtils.createCronKettleTransformationStatus(name));
-		return UpdateControl.patchStatus(resource);
+			final Context<CronKettleTransformation> context) {
+		try {
+			logger.info("reconciler  " + resource + " -> " + context);
+			final String name = context.getSecondaryResource(CronJob.class).get().getMetadata().getName();
+			resource.setStatus(StaticUtils.createCronKettleTransformationStatus(name));
+			return UpdateControl.patchStatus(resource);
+		} catch (final Exception ee) {
+			logger.severe(LogUtils.stackTraceToString(ee));
+			throw ee;
+		}
 	}
 
 }

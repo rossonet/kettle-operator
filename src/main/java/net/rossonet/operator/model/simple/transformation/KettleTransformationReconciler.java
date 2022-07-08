@@ -10,13 +10,14 @@ import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
+import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleTransformationResource.class) })
 public class KettleTransformationReconciler implements Reconciler<KettleTransformation> {
-	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
-
 	private static final Logger logger = Logger.getLogger(KettleTransformationReconciler.class.getName());
+
+	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 
 	private final KubernetesClient kubernetesClient;
 
@@ -30,11 +31,16 @@ public class KettleTransformationReconciler implements Reconciler<KettleTransfor
 
 	@Override
 	public UpdateControl<KettleTransformation> reconcile(final KettleTransformation resource,
-			final Context<KettleTransformation> context) throws Exception {
-		logger.info("reconciler  " + resource + " -> " + context);
-		final String name = context.getSecondaryResource(Job.class).get().getMetadata().getName();
-		resource.setStatus(StaticUtils.createKettleTransformationStatus(name));
-		return UpdateControl.patchStatus(resource);
+			final Context<KettleTransformation> context) {
+		try {
+			logger.info("reconciler  " + resource + " -> " + context);
+			final String name = context.getSecondaryResource(Job.class).get().getMetadata().getName();
+			resource.setStatus(StaticUtils.createKettleTransformationStatus(name));
+			return UpdateControl.patchStatus(resource);
+		} catch (final Exception ee) {
+			logger.severe(LogUtils.stackTraceToString(ee));
+			throw ee;
+		}
 	}
 
 }

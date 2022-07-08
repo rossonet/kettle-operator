@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
+import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 public class SimpleCronTransformationResource
@@ -23,17 +24,21 @@ public class SimpleCronTransformationResource
 	protected CronJob desired(final CronKettleTransformation kettleTransformation,
 			final Context<CronKettleTransformation> context) {
 		final CronJob job = new CronJob();
-		logger.info("kettle transformation " + kettleTransformation);
-		job.getMetadata().setName(kettleTransformation.getMetadata().getName());
-		job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
-		final PodSpec jobDetails = new PodSpec();
-		final Container container = new Container();
-		container.setImage(kettleTransformation.getSpec().getImage());
-		container.setCommand(StaticUtils.createCronTransformationCommand(kettleTransformation));
-		jobDetails.setContainers(Arrays.asList(new Container[] { container }));
-		job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(jobDetails);
-		job.getSpec().setSchedule(kettleTransformation.getSpec().getSchedule());
-		logger.info("actual cronjob " + job);
+		try {
+			logger.info("kettle transformation " + kettleTransformation);
+			job.getMetadata().setName(kettleTransformation.getMetadata().getName());
+			job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
+			final PodSpec jobDetails = new PodSpec();
+			final Container container = new Container();
+			container.setImage(kettleTransformation.getSpec().getImage());
+			container.setCommand(StaticUtils.createCronTransformationCommand(kettleTransformation));
+			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
+			job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(jobDetails);
+			job.getSpec().setSchedule(kettleTransformation.getSpec().getSchedule());
+			logger.info("actual cronjob " + job);
+		} catch (final Exception e) {
+			logger.severe(LogUtils.stackTraceToString(e));
+		}
 		return job;
 	}
 
