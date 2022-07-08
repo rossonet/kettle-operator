@@ -6,7 +6,9 @@ import java.util.logging.Logger;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PodSpec;
+import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import net.rossonet.operator.LogUtils;
@@ -33,6 +35,10 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 			container.setImage(kettleJob.getSpec().getImage());
 			container.setCommand(StaticUtils.createJobCommand(kettleJob));
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
+			final JobSpec spec = new JobSpec();
+			final PodTemplateSpec template = new PodTemplateSpec();
+			spec.setTemplate(template);
+			job.setSpec(spec);
 			job.getSpec().getTemplate().setSpec(jobDetails);
 			logger.info("actual job " + job);
 		} catch (final Exception e) {
