@@ -33,7 +33,18 @@ public class LogUtils {
 		} catch (final Exception n) {
 			return stackTraceToString(throwable);
 		}
+	}
 
+	public static String threadStackTrace() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Printing stack trace:");
+		final StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		for (int i = 1; i < elements.length; i++) {
+			final StackTraceElement s = elements[i];
+			sb.append("\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":"
+					+ s.getLineNumber() + ")");
+		}
+		return sb.toString();
 	}
 
 	private LogUtils() {

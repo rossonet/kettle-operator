@@ -84,8 +84,18 @@ rules:
   verbs:
   - '*'
 - apiGroups:
+  - "networking.k8s.io"
+  resources:
+  - ingresses
+  verbs:
+  - '*'
+- apiGroups:
   - "kettle.rossonet.net"
   resources:
+  - kettleides
+  - kettleides/status
+  - kettlerepositories
+  - kettlerepositories/status
   - kettlejobs
   - kettlejobs/status
   - kettletransformations

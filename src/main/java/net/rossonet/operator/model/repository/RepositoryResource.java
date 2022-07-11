@@ -1,6 +1,8 @@
 package net.rossonet.operator.model.repository;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
@@ -31,16 +33,20 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			deployment.setMetadata(new ObjectMeta());
 			deployment.getMetadata().setName(kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
-			final PodSpec jobDetails = new PodSpec();
+			final Map<String, String> labels = new HashMap<>();
+			labels.put(KettleRepositoryReconciler.SELECTOR, "true");
+			deployment.getMetadata().setLabels(labels);
+			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();
 			container.setImage(kettleRepository.getSpec().getImage());
-			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
+			podSpec.setContainers(Arrays.asList(new Container[] { container }));
 			final DeploymentSpec spec = new DeploymentSpec();
 			final PodTemplateSpec template = new PodTemplateSpec();
 			spec.setTemplate(template);
 			deployment.setSpec(spec);
-			deployment.getSpec().getTemplate().setSpec(jobDetails);
+			deployment.getSpec().getTemplate().setSpec(podSpec);
 			logger.info("actual deployment " + deployment);
+			logger.info(LogUtils.threadStackTrace());
 		} catch (final Exception e) {
 			logger.severe(LogUtils.stackTraceToString(e));
 		}

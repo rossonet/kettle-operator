@@ -6,5 +6,5 @@ metadata:
 spec:
   #image: image-value
   repositoryType: database
-  repositoryUrl: git-ssh://test.rossonet.net/repo1
+  repositoryUrl: git-ssh://test.rossonet.net/repo2
 
