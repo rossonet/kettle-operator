@@ -1,0 +1,10 @@
+apiVersion: kettle.rossonet.net/v1
+kind: KettleRepository
+metadata:
+  name: repository-example1
+  namespace: test-namespace
+spec:
+  #image: image-value
+  repositoryType: database
+  repositoryUrl: git-ssh://test.rossonet.net/repo1
+

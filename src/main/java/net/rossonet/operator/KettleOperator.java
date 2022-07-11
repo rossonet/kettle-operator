@@ -79,6 +79,8 @@ import io.fabric8.openshift.client.V1beta1OpenShiftClusterAutoscalingAPIGroupExt
 import io.javaoperatorsdk.operator.Operator;
 import net.rossonet.operator.model.cron.job.CronKettleJobReconciler;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformationReconciler;
+import net.rossonet.operator.model.ide.KettleIdeReconciler;
+import net.rossonet.operator.model.repository.KettleRepositoryReconciler;
 import net.rossonet.operator.model.simple.job.KettleJobReconciler;
 import net.rossonet.operator.model.simple.transformation.KettleTransformationReconciler;
 
@@ -131,7 +133,7 @@ public class KettleOperator {
 		// System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
 		logger.info("operator init");
 		try {
-			changeLogLevel("debug");
+			changeLogLevel("info");
 		} catch (final ConfigurationException e) {
 			logger.warning("Exception: " + e.getMessage());
 		}
@@ -143,6 +145,8 @@ public class KettleOperator {
 		operator.register(new KettleTransformationReconciler());
 		operator.register(new CronKettleJobReconciler());
 		operator.register(new CronKettleTransformationReconciler());
+		operator.register(new KettleIdeReconciler());
+		operator.register(new KettleRepositoryReconciler());
 		operator.installShutdownHook();
 		operator.start();
 		logger.info("operator started");
