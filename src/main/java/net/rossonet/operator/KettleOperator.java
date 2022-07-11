@@ -130,10 +130,10 @@ public class KettleOperator {
 	}
 
 	public static void main(final String[] args) throws IOException {
-		// System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
 		logger.info("operator init");
 		try {
-			changeLogLevel("info");
+			changeLogLevel("debug");
 		} catch (final ConfigurationException e) {
 			logger.warning("Exception: " + e.getMessage());
 		}

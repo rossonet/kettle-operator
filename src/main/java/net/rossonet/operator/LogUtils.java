@@ -37,12 +37,12 @@ public class LogUtils {
 
 	public static String threadStackTrace() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("Printing stack trace:");
+		sb.append("Printing stack trace:\n");
 		final StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		for (int i = 1; i < elements.length; i++) {
 			final StackTraceElement s = elements[i];
 			sb.append("\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":"
-					+ s.getLineNumber() + ")");
+					+ s.getLineNumber() + ")\n");
 		}
 		return sb.toString();
 	}
