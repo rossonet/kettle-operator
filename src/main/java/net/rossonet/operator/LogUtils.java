@@ -37,7 +37,7 @@ public class LogUtils {
 
 	public static String threadStackTrace() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("Printing stack trace:\n");
+		sb.append("Printing runtime stack trace:\n");
 		final StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		for (int i = 1; i < elements.length; i++) {
 			final StackTraceElement s = elements[i];

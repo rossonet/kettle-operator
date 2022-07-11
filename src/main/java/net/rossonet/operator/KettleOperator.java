@@ -133,7 +133,7 @@ public class KettleOperator {
 		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
 		logger.info("operator init");
 		try {
-			changeLogLevel("debug");
+			changeLogLevel("fine");
 		} catch (final ConfigurationException e) {
 			logger.warning("Exception: " + e.getMessage());
 		}
