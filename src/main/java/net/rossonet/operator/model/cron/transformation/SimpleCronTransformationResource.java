@@ -48,6 +48,8 @@ public class SimpleCronTransformationResource
 			jobDetails.setRestartPolicy("Never");
 			final CronJobSpec spec = new CronJobSpec();
 			final JobTemplateSpec template = new JobTemplateSpec();
+			template.setMetadata(new ObjectMeta());
+			template.getMetadata().setLabels(labels);
 			spec.setJobTemplate(template);
 			job.setSpec(spec);
 			job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(jobDetails);

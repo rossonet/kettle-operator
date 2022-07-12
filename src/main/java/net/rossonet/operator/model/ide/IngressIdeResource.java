@@ -35,6 +35,8 @@ public class IngressIdeResource extends CRUKubernetesDependentResource<Ingress, 
 			ingress.getMetadata().setNamespace(kettleIde.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
 			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			labels.put("app", kettleRepository.getMetadata().getName());
+			labels.put("app.kubernetes.io/part-of", kettleRepository.getMetadata().getName());
 			ingress.getMetadata().setLabels(labels);
 			final IngressSpec spec = new IngressSpec();
 			final IngressBackend backend = new IngressBackend();

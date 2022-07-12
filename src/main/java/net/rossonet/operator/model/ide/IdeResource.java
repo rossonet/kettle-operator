@@ -36,6 +36,8 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
 			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			labels.put("app", kettleRepository.getMetadata().getName());
+			labels.put("app.kubernetes.io/part-of", kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();
@@ -45,6 +47,8 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			podSpec.setRestartPolicy("Always");
 			final DeploymentSpec spec = new DeploymentSpec();
 			final PodTemplateSpec template = new PodTemplateSpec();
+			template.setMetadata(new ObjectMeta());
+			template.getMetadata().setLabels(labels);
 			spec.setTemplate(template);
 			deployment.setSpec(spec);
 			deployment.getSpec().getTemplate().setSpec(podSpec);

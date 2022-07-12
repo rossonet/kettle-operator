@@ -46,6 +46,8 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 			jobDetails.setRestartPolicy("Never");
 			final JobSpec spec = new JobSpec();
 			final PodTemplateSpec template = new PodTemplateSpec();
+			template.setMetadata(new ObjectMeta());
+			template.getMetadata().setLabels(labels);
 			spec.setTemplate(template);
 			job.setSpec(spec);
 			job.getSpec().getTemplate().setSpec(jobDetails);
