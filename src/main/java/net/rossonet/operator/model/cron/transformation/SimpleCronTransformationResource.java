@@ -36,6 +36,7 @@ public class SimpleCronTransformationResource
 			job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();
+			container.setName(kettleTransformation.getMetadata().getName());
 			container.setImage(kettleTransformation.getSpec().getImage());
 			container.setCommand(StaticUtils.createCronTransformationCommand(kettleTransformation));
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));

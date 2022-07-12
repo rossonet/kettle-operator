@@ -34,6 +34,7 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 			job.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();
+			container.setName(kettleJob.getMetadata().getName());
 			container.setImage(kettleJob.getSpec().getImage());
 			container.setCommand(StaticUtils.createJobCommand(kettleJob));
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));

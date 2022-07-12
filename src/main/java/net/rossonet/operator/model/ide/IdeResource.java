@@ -34,6 +34,7 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();
+			container.setName(kettleRepository.getMetadata().getName());
 			container.setImage(kettleRepository.getSpec().getImage());
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
 			final DeploymentSpec spec = new DeploymentSpec();

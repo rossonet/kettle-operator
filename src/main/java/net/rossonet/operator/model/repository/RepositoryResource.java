@@ -39,6 +39,7 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();
+			container.setName(kettleRepository.getMetadata().getName());
 			container.setImage(kettleRepository.getSpec().getImage());
 			podSpec.setContainers(Arrays.asList(new Container[] { container }));
 			final DeploymentSpec spec = new DeploymentSpec();

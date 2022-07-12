@@ -40,6 +40,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			job.getMetadata().setLabels(labels);
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();
+			container.setName(kettleTransformation.getMetadata().getName());
 			container.setImage(kettleTransformation.getSpec().getImage());
 			container.setCommand(StaticUtils.createTransformationCommand(kettleTransformation));
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
