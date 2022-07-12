@@ -12,7 +12,7 @@ import io.fabric8.kubernetes.api.model.apps.DeploymentSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
-import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
@@ -37,7 +37,7 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			container.setName(kettleRepository.getMetadata().getName());
 			container.setImage(kettleRepository.getSpec().getImage());
 			podSpec.setContainers(Arrays.asList(new Container[] { container }));
-			podSpec.setRestartPolicy("OnFailure");
+			podSpec.setRestartPolicy("Always");
 			final DeploymentSpec spec = new DeploymentSpec();
 			final PodTemplateSpec template = new PodTemplateSpec();
 			spec.setTemplate(template);

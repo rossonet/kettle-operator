@@ -14,7 +14,7 @@ import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
-import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
@@ -51,7 +51,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			job.setSpec(spec);
 			job.getSpec().getTemplate().setSpec(jobDetails);
 			logger.info("actual job " + job);
-			logger.info(LogUtils.threadStackTrace());
+			// logger.info(LogUtils.threadStackTrace());
 		} catch (final Exception e) {
 			logger.severe(LogUtils.stackTraceToString(e));
 		}

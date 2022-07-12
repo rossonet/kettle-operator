@@ -12,7 +12,7 @@ import io.fabric8.kubernetes.api.model.batch.v1.JobTemplateSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
-import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = StaticUtils.SELECTOR)

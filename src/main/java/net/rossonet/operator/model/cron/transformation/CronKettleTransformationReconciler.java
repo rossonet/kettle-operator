@@ -10,7 +10,7 @@ import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
-import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleCronTransformationResource.class) })

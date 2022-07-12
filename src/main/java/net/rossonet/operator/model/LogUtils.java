@@ -1,4 +1,4 @@
-package net.rossonet.operator;
+package net.rossonet.operator.model;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
