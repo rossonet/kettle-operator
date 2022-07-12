@@ -1,9 +1,11 @@
 package net.rossonet.operator.model.repository;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
@@ -29,6 +31,9 @@ public class ServiceRepositoryResource extends CRUKubernetesDependentResource<Se
 			service.getMetadata().setName(kettleRepository.getMetadata().getName());
 			service.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final ServiceSpec spec = new ServiceSpec();
+			final ServicePort port = new ServicePort();
+			port.setPort(80);
+			spec.setPorts(Arrays.asList(new ServicePort[] { port }));
 			service.setSpec(spec);
 			logger.info("actual service " + service);
 		} catch (final Exception e) {

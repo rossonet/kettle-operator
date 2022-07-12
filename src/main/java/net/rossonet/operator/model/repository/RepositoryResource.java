@@ -42,6 +42,7 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			container.setName(kettleRepository.getMetadata().getName());
 			container.setImage(kettleRepository.getSpec().getImage());
 			podSpec.setContainers(Arrays.asList(new Container[] { container }));
+			podSpec.setRestartPolicy("OnFailure");
 			final DeploymentSpec spec = new DeploymentSpec();
 			final PodTemplateSpec template = new PodTemplateSpec();
 			spec.setTemplate(template);

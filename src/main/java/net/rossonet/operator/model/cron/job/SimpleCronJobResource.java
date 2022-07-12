@@ -38,6 +38,7 @@ public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJo
 			container.setImage(kettleJob.getSpec().getImage());
 			container.setCommand(StaticUtils.createCronJobCommand(kettleJob));
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
+			jobDetails.setRestartPolicy("Never");
 			final CronJobSpec spec = new CronJobSpec();
 			final JobTemplateSpec template = new JobTemplateSpec();
 			spec.setJobTemplate(template);

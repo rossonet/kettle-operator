@@ -40,6 +40,7 @@ public class SimpleCronTransformationResource
 			container.setImage(kettleTransformation.getSpec().getImage());
 			container.setCommand(StaticUtils.createCronTransformationCommand(kettleTransformation));
 			jobDetails.setContainers(Arrays.asList(new Container[] { container }));
+			jobDetails.setRestartPolicy("Never");
 			final CronJobSpec spec = new CronJobSpec();
 			final JobTemplateSpec template = new JobTemplateSpec();
 			spec.setJobTemplate(template);
