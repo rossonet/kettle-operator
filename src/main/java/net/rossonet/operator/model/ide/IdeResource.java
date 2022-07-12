@@ -13,8 +13,9 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
 import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.StaticUtils;
 
-@KubernetesDependent(labelSelector = KettleIdeReconciler.SELECTOR)
+@KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class IdeResource extends CRUKubernetesDependentResource<Deployment, KettleIde> {
 	private static final Logger logger = Logger.getLogger(IdeResource.class.getName());
 

@@ -18,8 +18,6 @@ import net.rossonet.operator.model.StaticUtils;
 public class KettleRepositoryReconciler implements Reconciler<KettleRepository> {
 	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
 
-	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
-
 	@SuppressWarnings("unused")
 	private final KubernetesClient kubernetesClient;
 

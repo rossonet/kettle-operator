@@ -17,7 +17,7 @@ import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDep
 import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
-@KubernetesDependent(labelSelector = KettleTransformationReconciler.SELECTOR)
+@KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class SimpleTransformationResource extends CRUKubernetesDependentResource<Job, KettleTransformation> {
 	private static final Logger logger = Logger.getLogger(SimpleTransformationResource.class.getName());
 
@@ -36,7 +36,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 			job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
-			labels.put(KettleTransformationReconciler.SELECTOR, "true");
+			labels.put(StaticUtils.LABEL, "true");
 			job.getMetadata().setLabels(labels);
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();

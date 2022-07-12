@@ -9,8 +9,9 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
 import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.StaticUtils;
 
-@KubernetesDependent(labelSelector = KettleRepositoryReconciler.SELECTOR)
+@KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class ServiceRepositoryResource extends CRUKubernetesDependentResource<Service, KettleRepository> {
 	private static final Logger logger = Logger.getLogger(ServiceRepositoryResource.class.getName());
 

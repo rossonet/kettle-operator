@@ -15,8 +15,9 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
 import net.rossonet.operator.LogUtils;
+import net.rossonet.operator.model.StaticUtils;
 
-@KubernetesDependent(labelSelector = KettleRepositoryReconciler.SELECTOR)
+@KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class RepositoryResource extends CRUKubernetesDependentResource<Deployment, KettleRepository> {
 	private static final Logger logger = Logger.getLogger(RepositoryResource.class.getName());
 
@@ -34,7 +35,7 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			deployment.getMetadata().setName(kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
-			labels.put(KettleRepositoryReconciler.SELECTOR, "true");
+			labels.put(StaticUtils.LABEL, "true");
 			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();

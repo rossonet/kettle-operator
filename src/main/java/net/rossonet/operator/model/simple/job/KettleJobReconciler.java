@@ -16,7 +16,6 @@ import net.rossonet.operator.model.StaticUtils;
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleJobResource.class) })
 public class KettleJobReconciler implements Reconciler<KettleJob> {
 	private static final Logger logger = Logger.getLogger(KettleJobReconciler.class.getName());
-	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
 
 	@SuppressWarnings("unused")
 	private final KubernetesClient kubernetesClient;

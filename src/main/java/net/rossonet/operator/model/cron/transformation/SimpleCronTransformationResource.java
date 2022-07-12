@@ -15,7 +15,7 @@ import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDep
 import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
-@KubernetesDependent(labelSelector = CronKettleTransformationReconciler.SELECTOR)
+@KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class SimpleCronTransformationResource
 		extends CRUKubernetesDependentResource<CronJob, CronKettleTransformation> {
 	private static final Logger logger = Logger.getLogger(SimpleCronTransformationResource.class.getName());

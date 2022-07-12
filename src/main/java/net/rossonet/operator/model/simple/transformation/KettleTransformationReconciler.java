@@ -17,8 +17,6 @@ import net.rossonet.operator.model.StaticUtils;
 public class KettleTransformationReconciler implements Reconciler<KettleTransformation> {
 	private static final Logger logger = Logger.getLogger(KettleTransformationReconciler.class.getName());
 
-	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
-
 	@SuppressWarnings("unused")
 	private final KubernetesClient kubernetesClient;
 

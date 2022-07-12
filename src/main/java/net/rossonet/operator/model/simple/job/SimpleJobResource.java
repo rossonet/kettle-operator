@@ -15,7 +15,7 @@ import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDep
 import net.rossonet.operator.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
-@KubernetesDependent(labelSelector = KettleJobReconciler.SELECTOR)
+@KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class SimpleJobResource extends CRUKubernetesDependentResource<Job, KettleJob> {
 	private static final Logger logger = Logger.getLogger(SimpleJobResource.class.getName());
 
