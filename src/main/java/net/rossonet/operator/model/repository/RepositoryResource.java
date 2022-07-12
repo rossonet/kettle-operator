@@ -35,7 +35,7 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			deployment.getMetadata().setName(kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
-			labels.put(StaticUtils.LABEL, "true");
+			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
 			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();

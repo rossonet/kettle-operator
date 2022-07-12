@@ -1,6 +1,8 @@
 package net.rossonet.operator.model.ide;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
@@ -32,6 +34,9 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			deployment.setMetadata(new ObjectMeta());
 			deployment.getMetadata().setName(kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
+			final Map<String, String> labels = new HashMap<>();
+			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();
 			container.setName(kettleRepository.getMetadata().getName());

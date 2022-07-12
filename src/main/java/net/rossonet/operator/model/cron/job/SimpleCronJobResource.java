@@ -1,6 +1,8 @@
 package net.rossonet.operator.model.cron.job;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
@@ -32,6 +34,9 @@ public class SimpleCronJobResource extends CRUKubernetesDependentResource<CronJo
 			job.setMetadata(new ObjectMeta());
 			job.getMetadata().setName(kettleJob.getMetadata().getName());
 			job.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
+			final Map<String, String> labels = new HashMap<>();
+			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			job.getMetadata().setLabels(labels);
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();
 			container.setName(kettleJob.getMetadata().getName());

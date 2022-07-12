@@ -1,5 +1,7 @@
 package net.rossonet.operator.model.repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -31,6 +33,9 @@ public class IngressRepositoryResource extends CRUKubernetesDependentResource<In
 			ingress.setMetadata(new ObjectMeta());
 			ingress.getMetadata().setName(kettleRepository.getMetadata().getName());
 			ingress.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
+			final Map<String, String> labels = new HashMap<>();
+			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			ingress.getMetadata().setLabels(labels);
 			final IngressSpec spec = new IngressSpec();
 			final IngressBackend backend = new IngressBackend();
 			final IngressServiceBackend service = new IngressServiceBackend();

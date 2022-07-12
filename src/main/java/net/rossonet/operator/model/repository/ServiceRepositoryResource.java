@@ -1,6 +1,8 @@
 package net.rossonet.operator.model.repository;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -30,6 +32,9 @@ public class ServiceRepositoryResource extends CRUKubernetesDependentResource<Se
 			service.setMetadata(new ObjectMeta());
 			service.getMetadata().setName(kettleRepository.getMetadata().getName());
 			service.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
+			final Map<String, String> labels = new HashMap<>();
+			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			service.getMetadata().setLabels(labels);
 			final ServiceSpec spec = new ServiceSpec();
 			final ServicePort port = new ServicePort();
 			port.setPort(80);

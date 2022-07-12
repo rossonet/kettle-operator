@@ -1,6 +1,8 @@
 package net.rossonet.operator.model.ide;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -30,6 +32,9 @@ public class ServiceIdeResource extends CRUKubernetesDependentResource<Service, 
 			service.setMetadata(new ObjectMeta());
 			service.getMetadata().setName(kettleIde.getMetadata().getName());
 			service.getMetadata().setNamespace(kettleIde.getMetadata().getNamespace());
+			final Map<String, String> labels = new HashMap<>();
+			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			service.getMetadata().setLabels(labels);
 			final ServiceSpec spec = new ServiceSpec();
 			final ServicePort port = new ServicePort();
 			port.setPort(80);

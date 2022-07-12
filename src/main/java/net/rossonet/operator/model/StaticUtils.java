@@ -16,9 +16,10 @@ import net.rossonet.operator.model.simple.transformation.KettleTransformationSta
 
 public class StaticUtils {
 
-	public static final String LABEL = "managed-by_kettle-operator";
+	public static final String LABEL = "app.kubernetes.io/managed-by";
+	public static final String LABEL_DATA = "kettle-operator";
 
-	public static final String SELECTOR = "app.kubernetes.io/managed-by=kettle-operator";
+	public static final String SELECTOR = LABEL + "=" + LABEL_DATA;
 
 	public static List<String> createCronJobCommand(final CronKettleJob kettleJob) {
 		// TODO implementare logica
