@@ -33,9 +33,9 @@ public class ServiceRepositoryResource extends CRUKubernetesDependentResource<Se
 			service.getMetadata().setName(kettleRepository.getMetadata().getName());
 			service.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
-			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
-			labels.put("app", kettleRepository.getMetadata().getName());
-			labels.put("app.kubernetes.io/part-of", kettleRepository.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_MANAGED_BY, StaticUtils.DATA_MANAGED_BY);
+			labels.put(StaticUtils.LABEL_APP, kettleRepository.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_PART_OF, kettleRepository.getMetadata().getName());
 			service.getMetadata().setLabels(labels);
 			final ServiceSpec spec = new ServiceSpec();
 			final ServicePort port = new ServicePort();

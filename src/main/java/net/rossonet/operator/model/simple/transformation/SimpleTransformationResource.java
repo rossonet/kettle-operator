@@ -36,7 +36,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			job.getMetadata().setName(kettleTransformation.getMetadata().getName());
 			job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
-			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
+			labels.put(StaticUtils.LABEL_MANAGED_BY, StaticUtils.DATA_MANAGED_BY);
 			job.getMetadata().setLabels(labels);
 			final PodSpec jobDetails = new PodSpec();
 			final Container container = new Container();

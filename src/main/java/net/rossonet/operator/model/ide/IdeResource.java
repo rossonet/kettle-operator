@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.LabelSelector;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -35,9 +36,9 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			deployment.getMetadata().setName(kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setNamespace(kettleRepository.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
-			labels.put(StaticUtils.LABEL, StaticUtils.LABEL_DATA);
-			labels.put("app", kettleRepository.getMetadata().getName());
-			labels.put("app.kubernetes.io/part-of", kettleRepository.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_MANAGED_BY, StaticUtils.DATA_MANAGED_BY);
+			labels.put(StaticUtils.LABEL_APP, kettleRepository.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_PART_OF, kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();
@@ -46,6 +47,9 @@ public class IdeResource extends CRUKubernetesDependentResource<Deployment, Kett
 			podSpec.setContainers(Arrays.asList(new Container[] { container }));
 			podSpec.setRestartPolicy("Always");
 			final DeploymentSpec spec = new DeploymentSpec();
+			final LabelSelector selector = new LabelSelector();
+			selector.setMatchLabels(labels);
+			spec.setSelector(selector);
 			final PodTemplateSpec template = new PodTemplateSpec();
 			template.setMetadata(new ObjectMeta());
 			template.getMetadata().setLabels(labels);
