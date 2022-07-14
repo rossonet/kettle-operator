@@ -2,39 +2,53 @@ package net.rossonet.operator.model.cron.transformation;
 
 import java.util.Arrays;
 
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
 import net.rossonet.operator.model.simple.KettleWork;
 
 public class CronKettleTransformationSpec {
+
 	/**
 	 * The repository directory that contains the transformation, including the
 	 * leading slash
 	 */
+	@JsonPropertyDescription("The repository directory that contains the transformation, including the leading slash")
+	@NotNull
 	private String dir = null;
-
 	/** Exports all repository objects to one XML file */
+	@JsonPropertyDescription("Exports all repository objects to one XML file")
 	private String exprep = null;
 	/**
 	 * If you are calling a local KTR file, this is the filename, including the path
 	 * if it is not in the local directory
 	 */
+	@JsonPropertyDescription("If you are calling a local KTR file, this is the filename, including the path if it is not in the local directory")
 	private String file = null;
+	@JsonPropertyDescription("the Docker image default is " + KettleWork.DEFAULT_IMAGE)
 	private String image = KettleWork.DEFAULT_IMAGE;
+
 	/**
 	 * The logging level (Basic, Detailed, Debug, Rowlevel, Error, Nothing)
 	 */
+	@JsonPropertyDescription("The logging level (Basic, Detailed, Debug, Rowlevel, Error, Nothing)")
 	private String level = null;
 
 	/** Lists the directories in the specified repository */
+	@JsonPropertyDescription("Lists the directories in the specified repository")
 	private String listdir = null;
-
 	/** Lists the available repositories */
+	@JsonPropertyDescription("Lists the available repositories")
 	private String listrep = null;
+
 	/**
 	 * Lists the transformations in the specified repository directory
 	 */
+	@JsonPropertyDescription("Lists the transformations in the specified repository directory")
 	private String listtrans = null;
-
 	/** A local filename to write log output to */
+	@JsonPropertyDescription("A local filename to write log output to")
 	private String logfile = null;
 	/**
 	 * Prevents Pan from logging into a repository. If you have set the
@@ -43,30 +57,41 @@ public class CronKettleTransformationSpec {
 	 * specified repository, assuming you would like to execute a local KTR file
 	 * instead.
 	 */
+	@JsonPropertyDescription("Prevents Pan from logging into a repository. If you have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD environment variables, then this option will enable you to prevent Pan from logging into the specified repository, assuming you would like to execute a local KTR file instead.")
 	private String norep = null;
 	/**
 	 * Set a named parameter in a name=value format. For example: -param:FOO=bar
 	 */
+	@JsonPropertyDescription("Set a named parameter in a name=value format. For example: -param:FOO=bar")
 	private String[] param = null;
 	/** Repository password */
+	@JsonPropertyDescription("Repository password")
 	private String pass = null;
 	/**
 	 * Enterprise or database repository name, if you are using one
 	 */
+	@JsonPropertyDescription("Enterprise or database repository name, if you are using one")
 	private String rep = null;
 	/** Runs in safe mode, which enables extra checking */
+	@JsonPropertyDescription("Runs in safe mode, which enables extra checking")
 	private String safemode = null;
 	/**
 	 * schedule notation like crontab
 	 */
+	@JsonPropertyDescription("schedule notation like crontab")
+	@NotNull
 	private String schedule = null;
 	/**
 	 * The name of the transformation (as it appears in the repository) to launch
 	 */
+	@JsonPropertyDescription("The name of the transformation (as it appears in the repository) to launch")
 	private String trans = null;
 	/** Repository username */
+	@JsonPropertyDescription("Repository username")
 	private String user = null;
+
 	/** Shows the version, revision, and build date */
+	@JsonPropertyDescription("Shows the version, revision, and build date")
 	private String version = null;
 
 	public String getDir() {

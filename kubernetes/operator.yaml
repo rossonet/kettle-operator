@@ -129,39 +129,70 @@ spec:
           spec:
             properties:
               dir:
+                description: "The repository directory that contains the job, including\
+                  \ the leading slash"
                 type: string
               export:
+                description: Exports all linked resources of the specified job. The
+                  argument is the name of a ZIP file.
                 type: string
               file:
+                description: "If you are calling a local KJB file, this is the filename,\
+                  \ including the path if it is not in the local directory"
                 type: string
               image:
+                description: the Docker image default is rossonet/kettle-runner:latest
                 type: string
               job:
+                description: The name of the job (as it appears in the repository)
+                  to launch
                 type: string
               level:
+                description: "The logging level (Basic, Detailed, Debug, Rowlevel,\
+                  \ Error, Nothing)"
                 type: string
               listdir:
+                description: Lists the sub-directories within the specified repository
+                  directory
                 type: string
               listjob:
+                description: Lists the jobs in the specified repository directory
                 type: string
               listrep:
+                description: Lists the available repositories
                 type: string
               logfile:
+                description: A local filename to write log output to
                 type: string
               norep:
+                description: "Prevents Kitchen from logging into a repository. If\
+                  \ you have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD\
+                  \ environment variables, then this option will enable you to prevent\
+                  \ Kitchen from logging into the specified repository, assuming you\
+                  \ would like to execute a local KTR file instead."
                 type: string
               param:
+                description: Set a named parameter in a name=value format. For
                 type: string
               pass:
+                description: Repository password
                 type: string
               rep:
+                description: "Enterprise or database repository name, if you are using\
+                  \ one"
                 type: string
               schedule:
+                description: schedule notation like crontab
                 type: string
               user:
+                description: Repository username
                 type: string
               version:
+                description: "Shows the version, revision, and build date"
                 type: string
+            required:
+            - dir
+            - schedule
             type: object
           status:
             properties:
@@ -200,43 +231,75 @@ spec:
           spec:
             properties:
               dir:
+                description: "The repository directory that contains the transformation,\
+                  \ including the leading slash"
                 type: string
               exprep:
+                description: Exports all repository objects to one XML file
                 type: string
               file:
+                description: "If you are calling a local KTR file, this is the filename,\
+                  \ including the path if it is not in the local directory"
                 type: string
               image:
+                description: the Docker image default is rossonet/kettle-runner:latest
                 type: string
               level:
+                description: "The logging level (Basic, Detailed, Debug, Rowlevel,\
+                  \ Error, Nothing)"
                 type: string
               listdir:
+                description: Lists the directories in the specified repository
                 type: string
               listrep:
+                description: Lists the available repositories
                 type: string
               listtrans:
+                description: Lists the transformations in the specified repository
+                  directory
                 type: string
               logfile:
+                description: A local filename to write log output to
                 type: string
               norep:
+                description: "Prevents Pan from logging into a repository. If you\
+                  \ have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD\
+                  \ environment variables, then this option will enable you to prevent\
+                  \ Pan from logging into the specified repository, assuming you would\
+                  \ like to execute a local KTR file instead."
                 type: string
               param:
+                description: "Set a named parameter in a name=value format. For example:\
+                  \ -param:FOO=bar"
                 items:
                   type: string
                 type: array
               pass:
+                description: Repository password
                 type: string
               rep:
+                description: "Enterprise or database repository name, if you are using\
+                  \ one"
                 type: string
               safemode:
+                description: "Runs in safe mode, which enables extra checking"
                 type: string
               schedule:
+                description: schedule notation like crontab
                 type: string
               trans:
+                description: The name of the transformation (as it appears in the
+                  repository) to launch
                 type: string
               user:
+                description: Repository username
                 type: string
               version:
+                description: "Shows the version, revision, and build date"
                 type: string
+            required:
+            - dir
+            - schedule
             type: object
           status:
             properties:
@@ -314,37 +377,66 @@ spec:
           spec:
             properties:
               dir:
+                description: "The repository directory that contains the job, including\
+                  \ the leading slash"
                 type: string
               export:
+                description: Exports all linked resources of the specified job. The
+                  argument is the name of a ZIP file.
                 type: string
               file:
+                description: "If you are calling a local KJB file, this is the filename,\
+                  \ including the path if it is not in the local directory"
                 type: string
               image:
+                description: the Docker image default is rossonet/kettle-runner:latest
                 type: string
               job:
+                description: The name of the job (as it appears in the repository)
+                  to launch
                 type: string
               level:
+                description: "The logging level (Basic, Detailed, Debug, Rowlevel,\
+                  \ Error, Nothing)"
                 type: string
               listdir:
+                description: Lists the sub-directories within the specified repository
+                  directory
                 type: string
               listjob:
+                description: Lists the jobs in the specified repository directory
                 type: string
               listrep:
+                description: Lists the available repositories
                 type: string
               logfile:
+                description: A local filename to write log output to
                 type: string
               norep:
+                description: "Prevents Kitchen from logging into a repository. If\
+                  \ you have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD\
+                  \ environment variables, then this option will enable you to prevent\
+                  \ Kitchen from logging into the specified repository, assuming you\
+                  \ would like to execute a local KTR file instead."
                 type: string
               param:
+                description: Set a named parameter in a name=value format. For
                 type: string
               pass:
+                description: Repository password
                 type: string
               rep:
+                description: "Enterprise or database repository name, if you are using\
+                  \ one"
                 type: string
               user:
+                description: Repository username
                 type: string
               version:
+                description: "Shows the version, revision, and build date"
                 type: string
+            required:
+            - dir
             type: object
           status:
             properties:
@@ -428,41 +520,71 @@ spec:
           spec:
             properties:
               dir:
+                description: "The repository directory that contains the transformation,\
+                  \ including the leading slash"
                 type: string
               exprep:
+                description: Exports all repository objects to one XML file
                 type: string
               file:
+                description: "If you are calling a local KTR file, this is the filename,\
+                  \ including the path if it is not in the local directory"
                 type: string
               image:
+                description: the Docker image default is rossonet/kettle-runner:latest
                 type: string
               level:
+                description: "The logging level (Basic, Detailed, Debug, Rowlevel,\
+                  \ Error, Nothing)"
                 type: string
               listdir:
+                description: Lists the directories in the specified repository
                 type: string
               listrep:
+                description: Lists the available repositories
                 type: string
               listtrans:
+                description: Lists the transformations in the specified repository
+                  directory
                 type: string
               logfile:
+                description: A local filename to write log output to
                 type: string
               norep:
+                description: "Prevents Pan from logging into a repository. If you\
+                  \ have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD\
+                  \ environment variables, then this option will enable you to prevent\
+                  \ Pan from logging into the specified repository, assuming you would\
+                  \ like to execute a local KTR file instead."
                 type: string
               param:
+                description: "Set a named parameter in a name=value format. For example:\
+                  \ -param:FOO=bar"
                 items:
                   type: string
                 type: array
               pass:
+                description: Repository password
                 type: string
               rep:
+                description: "Enterprise or database repository name, if you are using\
+                  \ one"
                 type: string
               safemode:
+                description: "Runs in safe mode, which enables extra checking"
                 type: string
               trans:
+                description: The name of the transformation (as it appears in the
+                  repository) to launch
                 type: string
               user:
+                description: Repository username
                 type: string
               version:
+                description: "Shows the version, revision, and build date"
                 type: string
+            required:
+            - dir
             type: object
           status:
             properties:
