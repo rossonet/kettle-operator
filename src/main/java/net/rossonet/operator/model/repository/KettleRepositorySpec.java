@@ -7,14 +7,14 @@ import net.rossonet.operator.model.simple.KettleWork;
 public class KettleRepositorySpec {
 
 	@JsonPropertyDescription("Database name")
-	private String databaseName = null;
+	private String databaseName = "kettle";
 
 	@JsonPropertyDescription("the Docker image default is " + KettleWork.DEFAULT_REPOSITORY_IMAGE)
 	private String image = KettleWork.DEFAULT_REPOSITORY_IMAGE;
 
 	/** Database password */
 	@JsonPropertyDescription("Database password")
-	private String password = null;
+	private String password = "password";
 
 	/** Repository password */
 	@JsonPropertyDescription("Repository password")
@@ -39,7 +39,7 @@ public class KettleRepositorySpec {
 
 	/** Database username */
 	@JsonPropertyDescription("Database username")
-	private String username = null;
+	private String username = "rossonet";
 
 	public String getDatabaseName() {
 		return databaseName;

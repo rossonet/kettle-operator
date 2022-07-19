@@ -45,6 +45,8 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		try {
 			if (kettleRepository.getStatus().getReturnCode()
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
+				@SuppressWarnings("unused")
+				final org.postgresql.Driver driver;
 				final String dbURL = "jdbc:postgresql://" + serviceDatabase.getMetadata().getName() + ":5432/"
 						+ kettleRepository.getSpec().getDatabaseName();
 				final Properties parameters = new Properties();
@@ -87,6 +89,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
 			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
 			if (deploymentDatabase != null && deploymentDatabase.getStatus() != null
+					&& deploymentDatabase.getStatus().getReadyReplicas() != null
 					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
 				databaseManagement(resource, deploymentDatabase, serviceDatabase);
 			}

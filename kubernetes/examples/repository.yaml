@@ -8,4 +8,5 @@ spec:
   repositoryUrl: git-ssh://test.rossonet.net/repo2
   username: rossonet
   password: password1
+  databaseName: kettle
 
