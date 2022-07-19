@@ -474,23 +474,49 @@ spec:
         properties:
           spec:
             properties:
+              databaseName:
+                description: Database name
+                type: string
               image:
+                description: the Docker image default is postgres:14
                 type: string
-              repositoryData:
+              password:
+                description: Database password
                 type: string
-              repositoryType:
+              repositoryPassword:
+                description: Repository password
+                type: string
+              repositorySshCertificate:
+                description: Repository ssh certificate
                 type: string
               repositoryUrl:
+                description: "repository url to get the data. Should start with the\
+                  \ protocol 'git-ssh://', 'git-http://', 'git-https://', 's3://',\
+                  \ 'http://', 'https://' or 'file://'"
+                type: string
+              repositoryUsername:
+                description: Repository username
+                type: string
+              scheduleDelaySeconds:
+                description: synchronize local disk to remote repository delay in
+                  seconds
+                type: integer
+              username:
+                description: Database username
                 type: string
             type: object
           status:
             properties:
               errorMessage:
                 type: string
-              executionTimeMs:
-                type: integer
+              lastBackupTime:
+                type: string
               returnCode:
                 type: string
+              totalJobs:
+                type: integer
+              totalTransformations:
+                type: integer
             type: object
         type: object
     served: true

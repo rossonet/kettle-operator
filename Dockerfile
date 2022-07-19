@@ -6,7 +6,7 @@ RUN chmod +x gradlew
 RUN ./gradlew clean shadowJar
 
 FROM ubuntu:20.04
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jre bash gawk sed grep bc coreutils wget binutils && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jre bash gawk sed grep bc coreutils wget binutils nmap && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENTRYPOINT ["java"]
 CMD ["-XX:+UnlockExperimentalVMOptions","-Djava.net.preferIPv4Stack=true","-XshowSettings:vm","-Djava.security.egd=file:/dev/./urandom","-jar","/operator.jar"]
 COPY --from=ar4k-builder /ar4kAgent/build/libs/*-all.jar /operator.jar
