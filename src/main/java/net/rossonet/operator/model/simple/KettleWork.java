@@ -9,6 +9,8 @@ public interface KettleWork extends HasMetadata {
 	 */
 	public final String DEFAULT_IMAGE = "rossonet/kettle-runner:latest";
 
+	public final String DEFAULT_REPOSITORY_IMAGE = "postgres:14";
+
 	/**
 	 * Set to true to suppress warnings. Leave this option empty to view warnings.
 	 * Option to suppress warnings that the libwebkitgtk file is not installed when

@@ -1,11 +1,14 @@
 package net.rossonet.operator.model.repository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.LabelSelector;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PodSpec;
@@ -42,10 +45,15 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			labels.put(StaticUtils.LABEL_PART_OF, kettleRepository.getMetadata().getName());
 			deployment.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
-			final Container container = new Container();
-			container.setName(kettleRepository.getMetadata().getName());
-			container.setImage(kettleRepository.getSpec().getImage());
-			podSpec.setContainers(Arrays.asList(new Container[] { container }));
+			final Container containerPostgresql = new Container();
+			containerPostgresql.setName(kettleRepository.getMetadata().getName());
+			containerPostgresql.setImage(kettleRepository.getSpec().getImage());
+			final List<EnvVar> enviroments = new ArrayList<>();
+			enviroments.add(new EnvVar("POSTGRES_PASSWORD", kettleRepository.getSpec().getPass(), null));
+			enviroments.add(new EnvVar("POSTGRES_USER", kettleRepository.getSpec().getUser(), null));
+			enviroments.add(new EnvVar("POSTGRES_DB", kettleRepository.getSpec().getDatabaseName(), null));
+			containerPostgresql.setEnv(enviroments);
+			podSpec.setContainers(Arrays.asList(new Container[] { containerPostgresql }));
 			podSpec.setRestartPolicy("Always");
 			final DeploymentSpec spec = new DeploymentSpec();
 			final LabelSelector selector = new LabelSelector();
@@ -58,7 +66,6 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			deployment.setSpec(spec);
 			deployment.getSpec().getTemplate().setSpec(podSpec);
 			logger.info("actual deployment " + deployment);
-			// logger.info(LogUtils.threadStackTrace());
 		} catch (final Exception e) {
 			logger.severe(LogUtils.stackTraceToString(e));
 		}

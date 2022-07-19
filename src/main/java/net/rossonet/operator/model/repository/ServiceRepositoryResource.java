@@ -39,8 +39,9 @@ public class ServiceRepositoryResource extends CRUKubernetesDependentResource<Se
 			service.getMetadata().setLabels(labels);
 			final ServiceSpec spec = new ServiceSpec();
 			final ServicePort port = new ServicePort();
-			port.setPort(80);
+			port.setPort(5432);
 			spec.setPorts(Arrays.asList(new ServicePort[] { port }));
+			spec.setSelector(labels);
 			service.setSpec(spec);
 			logger.info("actual service " + service);
 		} catch (final Exception e) {

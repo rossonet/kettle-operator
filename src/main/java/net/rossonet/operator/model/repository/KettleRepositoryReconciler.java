@@ -2,6 +2,7 @@ package net.rossonet.operator.model.repository;
 
 import java.util.logging.Logger;
 
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -14,8 +15,12 @@ import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = RepositoryResource.class),
-		@Dependent(type = ServiceRepositoryResource.class), @Dependent(type = IngressRepositoryResource.class) })
+		@Dependent(type = ServiceRepositoryResource.class) })
 public class KettleRepositoryReconciler implements Reconciler<KettleRepository> {
+	public enum RepositoryStatus {
+		FAULT, INIT, SYNCHRONIZED
+	}
+
 	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
 
 	@SuppressWarnings("unused")
@@ -29,13 +34,24 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		this.kubernetesClient = kubernetesClient;
 	}
 
+	private void databaseManagement(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
+			final Service serviceDatabase) {
+		logger.info("manage database load");
+		// TODO Auto-generated method stub
+	}
+
 	@Override
 	public UpdateControl<KettleRepository> reconcile(final KettleRepository resource,
 			final Context<KettleRepository> context) {
 		try {
 			logger.info("reconciler  " + resource + " -> " + context);
-			final String name = context.getSecondaryResource(Deployment.class).get().getMetadata().getName();
-			resource.setStatus(StaticUtils.createKettleRepositoryStatus(name));
+			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
+			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
+			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
+			if (deploymentDatabase != null && deploymentDatabase.getStatus().getReadyReplicas() > 0
+					&& serviceDatabase != null) {
+				databaseManagement(resource, deploymentDatabase, serviceDatabase);
+			}
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));
