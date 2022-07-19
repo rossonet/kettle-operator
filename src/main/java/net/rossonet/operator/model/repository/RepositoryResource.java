@@ -49,8 +49,8 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			containerPostgresql.setName(kettleRepository.getMetadata().getName());
 			containerPostgresql.setImage(kettleRepository.getSpec().getImage());
 			final List<EnvVar> enviroments = new ArrayList<>();
-			enviroments.add(new EnvVar("POSTGRES_PASSWORD", kettleRepository.getSpec().getPass(), null));
-			enviroments.add(new EnvVar("POSTGRES_USER", kettleRepository.getSpec().getUser(), null));
+			enviroments.add(new EnvVar("POSTGRES_PASSWORD", kettleRepository.getSpec().getPassword(), null));
+			enviroments.add(new EnvVar("POSTGRES_USER", kettleRepository.getSpec().getUsername(), null));
 			enviroments.add(new EnvVar("POSTGRES_DB", kettleRepository.getSpec().getDatabaseName(), null));
 			containerPostgresql.setEnv(enviroments);
 			podSpec.setContainers(Arrays.asList(new Container[] { containerPostgresql }));
