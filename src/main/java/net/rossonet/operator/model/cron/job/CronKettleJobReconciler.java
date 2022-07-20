@@ -3,6 +3,7 @@ package net.rossonet.operator.model.cron.job;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -21,7 +22,7 @@ public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 	private final KubernetesClient kubernetesClient;
 
 	public CronKettleJobReconciler() {
-		this(new DefaultKubernetesClient());
+		this(new DefaultKubernetesClient(new ConfigBuilder().withNamespace(null).build()));
 	}
 
 	public CronKettleJobReconciler(final KubernetesClient kubernetesClient) {

@@ -140,12 +140,12 @@ public class KettleOperator {
 		final KubernetesClient client = new DefaultKubernetesClient(config);
 		// client.load(new FileInputStream("test.yaml")).get();
 		final Operator operator = new Operator(client);
-		operator.register(new KettleJobReconciler());
-		operator.register(new KettleTransformationReconciler());
-		operator.register(new CronKettleJobReconciler());
-		operator.register(new CronKettleTransformationReconciler());
-		operator.register(new KettleIdeReconciler());
-		operator.register(new KettleRepositoryReconciler());
+		operator.register(new KettleJobReconciler(client));
+		operator.register(new KettleTransformationReconciler(client));
+		operator.register(new CronKettleJobReconciler(client));
+		operator.register(new CronKettleTransformationReconciler(client));
+		operator.register(new KettleIdeReconciler(client));
+		operator.register(new KettleRepositoryReconciler(client));
 		operator.installShutdownHook();
 		operator.start();
 		logger.info("operator started");

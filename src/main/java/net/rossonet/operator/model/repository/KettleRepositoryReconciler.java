@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
@@ -51,7 +52,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	private final KubernetesClient kubernetesClient;
 
 	public KettleRepositoryReconciler() {
-		this(new DefaultKubernetesClient());
+		this(new DefaultKubernetesClient(new ConfigBuilder().withNamespace(null).build()));
 	}
 
 	public KettleRepositoryReconciler(final KubernetesClient kubernetesClient) {

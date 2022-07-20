@@ -3,6 +3,7 @@ package net.rossonet.operator.model.ide;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -22,7 +23,7 @@ public class KettleIdeReconciler implements Reconciler<KettleIde> {
 	private final KubernetesClient kubernetesClient;
 
 	public KettleIdeReconciler() {
-		this(new DefaultKubernetesClient());
+		this(new DefaultKubernetesClient(new ConfigBuilder().withNamespace(null).build()));
 	}
 
 	public KettleIdeReconciler(final KubernetesClient kubernetesClient) {

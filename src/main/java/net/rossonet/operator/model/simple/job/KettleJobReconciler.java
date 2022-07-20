@@ -3,6 +3,7 @@ package net.rossonet.operator.model.simple.job;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -21,7 +22,7 @@ public class KettleJobReconciler implements Reconciler<KettleJob> {
 	private final KubernetesClient kubernetesClient;
 
 	public KettleJobReconciler() {
-		this(new DefaultKubernetesClient());
+		this(new DefaultKubernetesClient(new ConfigBuilder().withNamespace(null).build()));
 	}
 
 	public KettleJobReconciler(final KubernetesClient kubernetesClient) {
