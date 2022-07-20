@@ -1,17 +1,16 @@
 package net.rossonet.operator.model.repository;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
-import java.util.Properties;
+import java.io.ByteArrayOutputStream;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.ExecListener;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
@@ -23,13 +22,32 @@ import net.rossonet.operator.model.StaticUtils;
 @ControllerConfiguration(dependents = { @Dependent(type = RepositoryResource.class),
 		@Dependent(type = ServiceRepositoryResource.class) })
 public class KettleRepositoryReconciler implements Reconciler<KettleRepository> {
+	private static class ExecPodExecListener implements ExecListener {
+		@Override
+		public void onClose(final int i, final String s) {
+			logger.info("Shell Closing");
+			execLatch.countDown();
+		}
+
+		@Override
+		public void onFailure(final Throwable t, final Response failureResponse) {
+			logger.info("Some error encountered");
+			execLatch.countDown();
+		}
+
+		@Override
+		public void onOpen() {
+			logger.info("Shell was opened");
+		}
+	}
+
 	public enum RepositoryStatus {
 		FAULT, INIT, SYNCHRONIZED
 	}
 
-	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
+	private static final CountDownLatch execLatch = new CountDownLatch(1);
 
-	@SuppressWarnings("unused")
+	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
 	private final KubernetesClient kubernetesClient;
 
 	public KettleRepositoryReconciler() {
@@ -45,32 +63,20 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		try {
 			if (kettleRepository.getStatus().getReturnCode()
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
-				@SuppressWarnings("unused")
-				final org.postgresql.Driver driver;
-				final String dbURL = "jdbc:postgresql://" + serviceDatabase.getMetadata().getName() + ":5432/"
-						+ kettleRepository.getSpec().getDatabaseName();
-				final Properties parameters = new Properties();
-				parameters.put("user", kettleRepository.getSpec().getUsername());
-				parameters.put("password", kettleRepository.getSpec().getPassword());
-				final Connection connection = DriverManager.getConnection(dbURL, parameters);
-				final Statement statementCreate = connection.createStatement();
-				statementCreate.execute("CREATE TABLE test_table (ID INT PRIMARY KEY , NAME TEXT)");
-				final Statement statementInsert = connection.createStatement();
-				statementInsert.execute("INSERT INTO test_table (3 , 'prova')");
-				final Statement statementSelect = connection.createStatement();
-				final ResultSet resultData = statementSelect.executeQuery("SELECT * from test_table");
-				final ResultSetMetaData rsmd = resultData.getMetaData();
-				final int columnCount = rsmd.getColumnCount();
-				while (resultData.next()) {
-					final StringBuilder tableData = new StringBuilder();
-					for (int colIdx = 1; colIdx <= columnCount; colIdx++) {
-						tableData.append(resultData.getObject(colIdx));
-						if (colIdx != columnCount) {
-							tableData.append(':');
-						}
-					}
-					logger.info("DATA: " + tableData.toString());
+				final ByteArrayOutputStream out = new ByteArrayOutputStream();
+				final ByteArrayOutputStream error = new ByteArrayOutputStream();
+
+				final ExecWatch execWatch = kubernetesClient.pods()
+						.inNamespace(deploymentDatabase.getMetadata().getNamespace())
+						.withName(deploymentDatabase.getMetadata().getName()).writingOutput(out).writingError(error)
+						.usingListener(new ExecPodExecListener()).exec("ls", "/");
+
+				final boolean latchTerminationStatus = execLatch.await(15, TimeUnit.SECONDS);
+				if (!latchTerminationStatus) {
+					logger.warning("Latch could not terminate within specified time");
 				}
+				logger.info("Exec Output: {} " + out.toString());
+				execWatch.close();
 			} else {
 				logger.info("database already loaded, kettleRepository.getStatus().getReturnCode()="
 						+ kettleRepository.getStatus().getReturnCode());
