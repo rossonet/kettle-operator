@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=Spoon (Kettle IDE)
+GenericName=IDE Kettle
+Exec=/data-integration/spoon.sh
+Terminal=true
+Icon=/data-integration/spoon.png
+Type=Application
+Categories=Application
+Comment=Pentaho Kettle IDE

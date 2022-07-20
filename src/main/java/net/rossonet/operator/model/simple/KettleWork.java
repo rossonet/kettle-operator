@@ -4,6 +4,8 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 
 public interface KettleWork extends HasMetadata {
 
+	public final String DEFAULT_IDE_IMAGE = "rossonet/kettle-runner-ide:latest";
+
 	/**
 	 * kettle container image
 	 */

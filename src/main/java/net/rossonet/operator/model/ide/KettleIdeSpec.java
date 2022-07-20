@@ -4,7 +4,7 @@ import net.rossonet.operator.model.simple.KettleWork;
 
 public class KettleIdeSpec {
 
-	private final String image = KettleWork.DEFAULT_IMAGE;
+	private final String image = KettleWork.DEFAULT_IDE_IMAGE;
 
 	public String getImage() {
 		return image;
