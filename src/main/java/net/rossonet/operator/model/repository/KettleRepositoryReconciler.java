@@ -65,7 +65,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
 				final ByteArrayOutputStream out = new ByteArrayOutputStream();
 				final ByteArrayOutputStream error = new ByteArrayOutputStream();
-
+				kubernetesClient.getConfiguration().setWebsocketTimeout(60000L);
 				final ExecWatch execWatch = kubernetesClient.pods()
 						.inNamespace(deploymentDatabase.getMetadata().getNamespace())
 						.withName(deploymentDatabase.getMetadata().getName()).writingOutput(out).writingError(error)
