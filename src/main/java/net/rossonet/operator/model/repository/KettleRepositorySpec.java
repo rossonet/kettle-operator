@@ -2,6 +2,7 @@ package net.rossonet.operator.model.repository;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
+import net.rossonet.operator.model.StaticUtils;
 import net.rossonet.operator.model.simple.KettleWork;
 
 public class KettleRepositorySpec {
@@ -24,7 +25,9 @@ public class KettleRepositorySpec {
 	@JsonPropertyDescription("Repository ssh certificate")
 	private String repositorySshCertificate = null;
 
-	@JsonPropertyDescription("repository url to get the data. Should start with the protocol 'git-ssh://', 'git-http://', 'git-https://', 's3://', 'http://', 'https://' or 'file://'")
+	@JsonPropertyDescription("repository url to get the data. Should start with the protocol '" + StaticUtils.GIT_SSH
+			+ "', '" + StaticUtils.GIT_HTTP + "', '" + StaticUtils.GIT_HTTPS + "', '" + StaticUtils.S3 + "', '"
+			+ StaticUtils.HTTP + "', '" + StaticUtils.HTTPS + "' or '" + StaticUtils.FILE + "'")
 	private String repositoryUrl = null;
 
 	/** Repository username */

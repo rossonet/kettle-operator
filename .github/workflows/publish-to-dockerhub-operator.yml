@@ -1,4 +1,4 @@
-name: Build and publish docker image to DockerHub
+name: Build and publish docker image of Operator to DockerHub
 
 on:
   push:

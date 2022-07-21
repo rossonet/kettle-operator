@@ -1,7 +1,5 @@
 package net.rossonet.operator;
 
-import org.junit.jupiter.api.Test;
-
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -10,7 +8,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 
 public class KubernetesApiClient {
 
-	@Test
+	// @Test
 	public void tryConnection() {
 		final Config config = new ConfigBuilder().withNamespace(null).build();
 		final KubernetesClient client = new DefaultKubernetesClient(config);
