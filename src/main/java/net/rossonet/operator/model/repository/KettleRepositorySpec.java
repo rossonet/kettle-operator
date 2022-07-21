@@ -27,7 +27,8 @@ public class KettleRepositorySpec {
 
 	@JsonPropertyDescription("repository url to get the data. Should start with the protocol '" + StaticUtils.GIT_SSH
 			+ "', '" + StaticUtils.GIT_HTTP + "', '" + StaticUtils.GIT_HTTPS + "', '" + StaticUtils.S3 + "', '"
-			+ StaticUtils.HTTP + "', '" + StaticUtils.HTTPS + "' or '" + StaticUtils.FILE + "'")
+			+ StaticUtils.FTP + "', '" + StaticUtils.HTTP + "', '" + StaticUtils.HTTPS + "' or '" + StaticUtils.FILE
+			+ "'")
 	private String repositoryUrl = null;
 
 	/** Repository username */

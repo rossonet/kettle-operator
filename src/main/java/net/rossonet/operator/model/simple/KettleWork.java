@@ -11,7 +11,7 @@ public interface KettleWork extends HasMetadata {
 	 */
 	public final String DEFAULT_IMAGE = "rossonet/kettle-runner:latest";
 
-	public final String DEFAULT_REPOSITORY_IMAGE = "postgres:14";
+	public final String DEFAULT_REPOSITORY_IMAGE = "rossonet/kettle-repository:latest";
 
 	/**
 	 * Set to true to suppress warnings. Leave this option empty to view warnings.

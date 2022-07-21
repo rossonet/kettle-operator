@@ -107,6 +107,8 @@ public class StaticUtils {
 	public static final String DATA_MANAGED_BY = "kettle-operator";
 	private static final CountDownLatch execLatch = new CountDownLatch(1);
 	public static final String FILE = "file://";
+
+	public static final String FTP = "ftp://";
 	public static final String GIT_HTTP = "git-http://";
 	public static final String GIT_HTTPS = "git-https://";
 
@@ -185,15 +187,14 @@ public class StaticUtils {
 		final ByteArrayOutputStream standardError = new ByteArrayOutputStream();
 		final String namespace = deploymentDatabase.getMetadata().getNamespace();
 		final String podName = deploymentDatabase.getMetadata().getName();
-		// final String[] command = new String[] { "ls", "/" };
 		String podNameSelected = "NaN";
 		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
 				.list().getItems()) {
-			logger.info("* pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
+			logger.fine("* pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
 			podNameSelected = pod.getMetadata().getName();
 			logger.finer(pod.toString() + "\n");
 		}
-		logger.info("try '" + command + "' to " + podName + " in namespace " + namespace);
+		logger.info("**** try '" + command + "' to " + podName + " in namespace " + namespace);
 		final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected)
 				.writingOutput(standardOutput).writingError(standardError).usingListener(new ExecPodListener())
 				.exec(command);

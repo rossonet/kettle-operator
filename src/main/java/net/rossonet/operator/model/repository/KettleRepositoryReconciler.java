@@ -49,25 +49,31 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 			if (kettleRepository.getStatus().getReturnCode()
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
 				String dumpPath = null;
-				if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.HTTP)
-						|| kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.HTTP)) {
-					dumpPath = downloadDumpDatabaseFromHttpOrHttps(deploymentDatabase, kettleRepository.getSpec());
-				} else if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.GIT_HTTP)
-						|| kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.GIT_HTTPS)
-						|| kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.GIT_SSH)) {
+				final String repositoryUrl = kettleRepository.getSpec().getRepositoryUrl();
+				if (repositoryUrl.startsWith(StaticUtils.HTTP) || repositoryUrl.startsWith(StaticUtils.HTTP)
+						|| repositoryUrl.startsWith(StaticUtils.FTP)) {
+					logger.severe(repositoryUrl + " is managed by wget");
+					dumpPath = downloadDumpDatabaseFromFtpHttpOrHttps(deploymentDatabase, kettleRepository.getSpec());
+				} else if (repositoryUrl.startsWith(StaticUtils.GIT_HTTP)
+						|| repositoryUrl.startsWith(StaticUtils.GIT_HTTPS)
+						|| repositoryUrl.startsWith(StaticUtils.GIT_SSH)) {
+					logger.severe(repositoryUrl + " is managed by git");
 					dumpPath = downloadDumpDatabaseFromGit(deploymentDatabase, kettleRepository.getSpec());
-				} else if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.S3)) {
+				} else if (repositoryUrl.startsWith(StaticUtils.S3)) {
+					logger.severe(repositoryUrl + " is managed by s3 client");
 					dumpPath = downloadDumpDatabaseFromS3(deploymentDatabase, kettleRepository.getSpec());
-				} else if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.FILE)) {
-					dumpPath = kettleRepository.getSpec().getRepositoryUrl().substring(StaticUtils.FILE.length());
+				} else if (repositoryUrl.startsWith(StaticUtils.FILE)) {
+					logger.severe(repositoryUrl + " could not to be downloaded");
+					dumpPath = repositoryUrl.substring(StaticUtils.FILE.length());
+				} else {
+					dumpPath = null;
+					logger.severe(repositoryUrl + " not recognized");
 				}
 				if (dumpPath != null) {
-					final String[] command = new String[] { "cat", dumpPath, "|",
-							"PGPASSWORD=" + kettleRepository.getSpec().getPassword(), "psql", "-h", "localhost", "-U",
-							kettleRepository.getSpec().getUsername(), kettleRepository.getSpec().getDatabaseName() };
-					StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command,
-							TIMEOUT_RESTORE_DB_SECONDS);
+					restoreDatabase(kettleRepository, deploymentDatabase, dumpPath);
 				}
+				kettleRepository.getStatus()
+						.setReturnCode(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString());
 			} else {
 				logger.info("database already loaded, kettleRepository.getStatus().getReturnCode()="
 						+ kettleRepository.getStatus().getReturnCode());
@@ -77,20 +83,29 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		}
 	}
 
-	private String downloadDumpDatabaseFromGit(final Deployment deploymentDatabase, final KettleRepositorySpec spec)
-			throws InterruptedException {
-		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
-		// TODO Auto-generated method stub
-		return null;
+	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
+			String dumpPath) throws InterruptedException {
+		final String[] command = new String[] { "cat", dumpPath, "|",
+				"PGPASSWORD=" + kettleRepository.getSpec().getPassword(), "psql", "-h", "localhost", "-U",
+				kettleRepository.getSpec().getUsername(), kettleRepository.getSpec().getDatabaseName() };
+		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command,
+				TIMEOUT_RESTORE_DB_SECONDS);
 	}
 
-	private String downloadDumpDatabaseFromHttpOrHttps(final Deployment deploymentDatabase,
+	private String downloadDumpDatabaseFromFtpHttpOrHttps(final Deployment deploymentDatabase,
 			final KettleRepositorySpec spec) throws InterruptedException {
 		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
 		final String targetFile = targetDirectory + "/repository.sql";
 		final String[] command = new String[] { "wget", "-O", targetFile, spec.getRepositoryUrl() };
 		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
 		return targetFile;
+	}
+
+	private String downloadDumpDatabaseFromGit(final Deployment deploymentDatabase, final KettleRepositorySpec spec)
+			throws InterruptedException {
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private String downloadDumpDatabaseFromS3(final Deployment deploymentDatabase, final KettleRepositorySpec spec)
