@@ -36,6 +36,11 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		this.kubernetesClient = kubernetesClient;
 	}
 
+	private boolean checkSynchronizedFile(final Deployment deploymentDatabase) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase) throws InterruptedException {
 		final String target = "/tmp/" + UUID.randomUUID().toString();
 		final String[] command = new String[] { "mkdir", "-p", target };
@@ -47,10 +52,17 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 			final Service serviceDatabase) {
 		try {
 			if (kettleRepository.getStatus().getReturnCode()
+					.equals(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString())) {
+				if (!checkSynchronizedFile(deploymentDatabase)) {
+					kettleRepository.getStatus()
+							.setReturnCode(KettleRepositoryReconciler.RepositoryStatus.INIT.toString());
+				}
+			}
+			if (kettleRepository.getStatus().getReturnCode()
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
 				String dumpPath = null;
 				final String repositoryUrl = kettleRepository.getSpec().getRepositoryUrl();
-				if (repositoryUrl.startsWith(StaticUtils.HTTP) || repositoryUrl.startsWith(StaticUtils.HTTP)
+				if (repositoryUrl.startsWith(StaticUtils.HTTP) || repositoryUrl.startsWith(StaticUtils.HTTPS)
 						|| repositoryUrl.startsWith(StaticUtils.FTP)) {
 					logger.severe(repositoryUrl + " is managed by wget");
 					dumpPath = downloadDumpDatabaseFromFtpHttpOrHttps(deploymentDatabase, kettleRepository.getSpec());
@@ -72,8 +84,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 				if (dumpPath != null) {
 					restoreDatabase(kettleRepository, deploymentDatabase, dumpPath);
 				}
-				kettleRepository.getStatus()
-						.setReturnCode(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString());
+				setStatusSynchronized(kettleRepository, deploymentDatabase);
 			} else {
 				logger.info("database already loaded, kettleRepository.getStatus().getReturnCode()="
 						+ kettleRepository.getStatus().getReturnCode());
@@ -81,15 +92,6 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		} catch (final Exception e) {
 			logger.severe("Exception in database management " + LogUtils.stackTraceToString(e));
 		}
-	}
-
-	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
-			String dumpPath) throws InterruptedException {
-		final String[] command = new String[] { "cat", dumpPath, "|",
-				"PGPASSWORD=" + kettleRepository.getSpec().getPassword(), "psql", "-h", "localhost", "-U",
-				kettleRepository.getSpec().getUsername(), kettleRepository.getSpec().getDatabaseName() };
-		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command,
-				TIMEOUT_RESTORE_DB_SECONDS);
 	}
 
 	private String downloadDumpDatabaseFromFtpHttpOrHttps(final Deployment deploymentDatabase,
@@ -127,12 +129,29 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 					&& deploymentDatabase.getStatus().getReadyReplicas() != null
 					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
 				databaseManagement(resource, deploymentDatabase, serviceDatabase);
+			} else {
+				logger.info("reconciler  waiting all kubernetes resources");
 			}
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));
 			throw ee;
 		}
+	}
+
+	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
+			final String dumpPath) throws InterruptedException {
+		final String[] command = new String[] { "cat", dumpPath, "|",
+				"PGPASSWORD=" + kettleRepository.getSpec().getPassword(), "psql", "-h", "localhost", "-U",
+				kettleRepository.getSpec().getUsername(), kettleRepository.getSpec().getDatabaseName() };
+		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+	}
+
+	private void setStatusSynchronized(final KettleRepository kettleRepository, final Deployment deploymentDatabase)
+			throws InterruptedException {
+		final String[] command = new String[] { "date", ">", "/SYNCHRONIZED" };
+		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, 60);
+		kettleRepository.getStatus().setReturnCode(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString());
 	}
 
 }

@@ -1,6 +1,6 @@
 # Pentaho Kettle Operator by Rossonet
 
-## Kubernetes Operator
+## Kubernetes Kettle Operator
 [![Test on master branch with Gradle](https://github.com/rossonet/kettle-operator/actions/workflows/test-on-master-with-gradle.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/test-on-master-with-gradle.yml)
 [![Build and publish docker image of Operator to DockerHub](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-operator.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-operator.yml)
 [![Build and publish docker images of runner components to DockerHub](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-runners.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-runners.yml)
@@ -12,7 +12,7 @@
 
 ## Rossonet
 
-### Framework
+### Framework Java
 
 [https://javaoperatorsdk.io/](https://javaoperatorsdk.io/)
 
