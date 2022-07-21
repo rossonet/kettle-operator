@@ -5,6 +5,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -23,7 +24,7 @@ import net.rossonet.operator.model.StaticUtils;
 @ControllerConfiguration(dependents = { @Dependent(type = RepositoryResource.class),
 		@Dependent(type = ServiceRepositoryResource.class) })
 public class KettleRepositoryReconciler implements Reconciler<KettleRepository> {
-	private static class ExecPodExecListener implements ExecListener {
+	private static class ExecPodListener implements ExecListener {
 		@Override
 		public void onClose(final int i, final String s) {
 			logger.info("Shell Closing");
@@ -64,19 +65,26 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		try {
 			if (kettleRepository.getStatus().getReturnCode()
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
-				final ByteArrayOutputStream out = new ByteArrayOutputStream();
-				final ByteArrayOutputStream error = new ByteArrayOutputStream();
+				final ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
+				final ByteArrayOutputStream standardError = new ByteArrayOutputStream();
 				kubernetesClient.getConfiguration().setWebsocketTimeout(60000L);
-				final ExecWatch execWatch = kubernetesClient.pods()
-						.inNamespace(deploymentDatabase.getMetadata().getNamespace())
-						.withName(deploymentDatabase.getMetadata().getName()).writingOutput(out).writingError(error)
-						.usingListener(new ExecPodExecListener()).exec("ls", "/");
-
-				final boolean latchTerminationStatus = execLatch.await(15, TimeUnit.SECONDS);
+				final String namespace = deploymentDatabase.getMetadata().getNamespace();
+				final String podName = deploymentDatabase.getMetadata().getName();
+				final String[] command = new String[] { "ls", "/" };
+				for (final Pod pod : kubernetesClient.pods().list().getItems()) {
+					logger.info("found pod " + pod.getMetadata().getName() + " in namespace "
+							+ pod.getMetadata().getNamespace());
+					logger.info(pod.toString() + "\n");
+				}
+				logger.info("try '" + command + "' to " + podName + " in namaespace " + namespace);
+				final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podName)
+						.writingOutput(standardOutput).writingError(standardError).usingListener(new ExecPodListener())
+						.exec(command);
+				final boolean latchTerminationStatus = execLatch.await(60, TimeUnit.SECONDS);
 				if (!latchTerminationStatus) {
 					logger.warning("Latch could not terminate within specified time");
 				}
-				logger.info("Exec Output: {} " + out.toString());
+				logger.info("Exec Output: {} " + standardOutput.toString());
 				execWatch.close();
 			} else {
 				logger.info("database already loaded, kettleRepository.getStatus().getReturnCode()="
