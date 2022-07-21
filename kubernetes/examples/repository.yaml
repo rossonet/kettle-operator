@@ -5,7 +5,7 @@ metadata:
   namespace: test-namespace
 spec:
   #image: image-value
-  repositoryUrl: git-ssh://test.rossonet.net/repo2
+  repositoryUrl: https://www.rossonet.net/dati/pdi/repository/repository.sql
   username: rossonet
   password: password1
   databaseName: kettle

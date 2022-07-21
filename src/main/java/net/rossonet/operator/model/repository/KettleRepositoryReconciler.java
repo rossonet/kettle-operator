@@ -1,5 +1,6 @@
 package net.rossonet.operator.model.repository;
 
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.Service;
@@ -24,6 +25,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	}
 
 	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
+	private static final long TIMEOUT_RESTORE_DB_SECONDS = 5 * 60;
 	private final KubernetesClient kubernetesClient;
 
 	public KettleRepositoryReconciler() {
@@ -34,14 +36,38 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		this.kubernetesClient = kubernetesClient;
 	}
 
+	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase) throws InterruptedException {
+		final String target = "/tmp/" + UUID.randomUUID().toString();
+		final String[] command = new String[] { "mkdir", "-p", target };
+		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, 15);
+		return target;
+	}
+
 	private void databaseManagement(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
 			final Service serviceDatabase) {
 		try {
 			if (kettleRepository.getStatus().getReturnCode()
 					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
-
-				final String[] command = new String[] { "ls", "/" };
-				StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, 60);
+				String dumpPath = null;
+				if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.HTTP)
+						|| kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.HTTP)) {
+					dumpPath = downloadDumpDatabaseFromHttpOrHttps(deploymentDatabase, kettleRepository.getSpec());
+				} else if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.GIT_HTTP)
+						|| kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.GIT_HTTPS)
+						|| kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.GIT_SSH)) {
+					dumpPath = downloadDumpDatabaseFromGit(deploymentDatabase, kettleRepository.getSpec());
+				} else if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.S3)) {
+					dumpPath = downloadDumpDatabaseFromS3(deploymentDatabase, kettleRepository.getSpec());
+				} else if (kettleRepository.getSpec().getRepositoryUrl().startsWith(StaticUtils.FILE)) {
+					dumpPath = kettleRepository.getSpec().getRepositoryUrl().substring(StaticUtils.FILE.length());
+				}
+				if (dumpPath != null) {
+					final String[] command = new String[] { "cat", dumpPath, "|",
+							"PGPASSWORD=" + kettleRepository.getSpec().getPassword(), "psql", "-h", "localhost", "-U",
+							kettleRepository.getSpec().getUsername(), kettleRepository.getSpec().getDatabaseName() };
+					StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command,
+							TIMEOUT_RESTORE_DB_SECONDS);
+				}
 			} else {
 				logger.info("database already loaded, kettleRepository.getStatus().getReturnCode()="
 						+ kettleRepository.getStatus().getReturnCode());
@@ -49,6 +75,29 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		} catch (final Exception e) {
 			logger.severe("Exception in database management " + LogUtils.stackTraceToString(e));
 		}
+	}
+
+	private String downloadDumpDatabaseFromGit(final Deployment deploymentDatabase, final KettleRepositorySpec spec)
+			throws InterruptedException {
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String downloadDumpDatabaseFromHttpOrHttps(final Deployment deploymentDatabase,
+			final KettleRepositorySpec spec) throws InterruptedException {
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		final String targetFile = targetDirectory + "/repository.sql";
+		final String[] command = new String[] { "wget", "-O", targetFile, spec.getRepositoryUrl() };
+		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+		return targetFile;
+	}
+
+	private String downloadDumpDatabaseFromS3(final Deployment deploymentDatabase, final KettleRepositorySpec spec)
+			throws InterruptedException {
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
