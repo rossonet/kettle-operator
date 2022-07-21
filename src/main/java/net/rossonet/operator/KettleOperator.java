@@ -138,7 +138,6 @@ public class KettleOperator {
 		}
 		final Config config = new ConfigBuilder().withNamespace(null).build();
 		final KubernetesClient client = new DefaultKubernetesClient(config);
-		// client.load(new FileInputStream("test.yaml")).get();
 		final Operator operator = new Operator(client);
 		operator.register(new KettleJobReconciler(client));
 		operator.register(new KettleTransformationReconciler(client));
@@ -150,6 +149,7 @@ public class KettleOperator {
 		operator.start();
 		logger.info("operator started");
 		new FtBasic(new TkFork(new FkRegex("/health", "ALL GOOD.")), 8080).start(Exit.NEVER);
+		client.close();
 	}
 
 	@SuppressWarnings("unused")

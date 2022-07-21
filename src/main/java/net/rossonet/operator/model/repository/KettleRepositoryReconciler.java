@@ -71,13 +71,16 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 				final String namespace = deploymentDatabase.getMetadata().getNamespace();
 				final String podName = deploymentDatabase.getMetadata().getName();
 				final String[] command = new String[] { "ls", "/" };
-				for (final Pod pod : kubernetesClient.pods().list().getItems()) {
-					logger.info("found pod " + pod.getMetadata().getName() + " in namespace "
+				String podNameSelected = "NaN";
+				for (final Pod pod : kubernetesClient.pods().inNamespace(namespace)
+						.withLabel(StaticUtils.LABEL_APP, podName).list().getItems()) {
+					logger.info("* pod " + pod.getMetadata().getName() + " in namespace "
 							+ pod.getMetadata().getNamespace());
+					podNameSelected = pod.getMetadata().getName();
 					logger.info(pod.toString() + "\n");
 				}
-				logger.info("try '" + command + "' to " + podName + " in namaespace " + namespace);
-				final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podName)
+				logger.info("try '" + command + "' to " + podName + " in namespace " + namespace);
+				final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected)
 						.writingOutput(standardOutput).writingError(standardError).usingListener(new ExecPodListener())
 						.exec(command);
 				final boolean latchTerminationStatus = execLatch.await(60, TimeUnit.SECONDS);
