@@ -173,11 +173,13 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
 			final String dumpPath) throws InterruptedException, IOException {
-		final String script = "cat " + dumpPath + " | PGPASSWORD=" + kettleRepository.getSpec().getPassword()
-				+ " psql -h localhost -U " + kettleRepository.getSpec().getUsername() + " "
-				+ kettleRepository.getSpec().getDatabaseName() + "\n";
+		final String script = "#!/bin/bash\ncat " + dumpPath + " | PGPASSWORD="
+				+ kettleRepository.getSpec().getPassword() + " psql -h localhost -U "
+				+ kettleRepository.getSpec().getUsername() + " " + kettleRepository.getSpec().getDatabaseName() + "\n";
 		StaticUtils.saveStringToFileOnPod(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
-		final String[] command = new String[] { "bash", TMP_LOAD_DB_SCRIPT_PATH };
+		final String[] commandChmod = new String[] { "chmod", "+x", TMP_LOAD_DB_SCRIPT_PATH };
+		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, commandChmod, TIMEOUT_RESTORE_DB_SECONDS);
+		final String[] command = new String[] { TMP_LOAD_DB_SCRIPT_PATH };
 		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
 	}
 

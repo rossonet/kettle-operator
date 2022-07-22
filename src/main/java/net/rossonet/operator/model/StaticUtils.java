@@ -33,7 +33,7 @@ public class StaticUtils {
 	private static class ExecPodListener implements ExecListener {
 		@Override
 		public void onClose(final int i, final String s) {
-			logger.info("Shell Closing with retunr code " + i);
+			logger.info("Shell Closing with return code " + i);
 			logger.info(s);
 			execLatch.countDown();
 		}
