@@ -337,7 +337,11 @@ spec:
         properties:
           spec:
             properties:
+              host:
+                type: string
               image:
+                type: string
+              path:
                 type: string
             type: object
           status:
@@ -478,7 +482,7 @@ spec:
                 description: Database name
                 type: string
               image:
-                description: the Docker image default is postgres:14
+                description: the Docker image default is rossonet/kettle-repository:latest
                 type: string
               password:
                 description: Database password
@@ -492,15 +496,11 @@ spec:
               repositoryUrl:
                 description: "repository url to get the data. Should start with the\
                   \ protocol 'git-ssh://', 'git-http://', 'git-https://', 's3://',\
-                  \ 'http://', 'https://' or 'file://'"
+                  \ 'ftp://', 'http://', 'https://' or 'file://'"
                 type: string
               repositoryUsername:
                 description: Repository username
                 type: string
-              scheduleDelaySeconds:
-                description: synchronize local disk to remote repository delay in
-                  seconds
-                type: integer
               username:
                 description: Database username
                 type: string
