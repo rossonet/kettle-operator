@@ -2,6 +2,7 @@ package net.rossonet.operator.model.repository;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -47,17 +48,17 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 			throws IOException, InterruptedException {
 		final String script = "if [ -f /SYNCHRONIZED ]\nthen\necho '" + SYNCHRONIZED_FILE_MARK
 				+ "'\nelse\necho 'KO'\nfi\n";
-		StaticUtils.saveStringToFileOnPod(kubernetesClient, deploymentDatabase, script, TMP_CHECK_SCRIPT_SH);
+		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_CHECK_SCRIPT_SH);
 		final String[] command = new String[] { "bash", TMP_CHECK_SCRIPT_SH };
-		final ExecResult checkResult = StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command,
-				TIMEOUT_RESTORE_DB_SECONDS);
-		return checkResult.getStandardOutput().contains(SYNCHRONIZED_FILE_MARK);
+		final List<ExecResult> checkResult = StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase,
+				command, TIMEOUT_RESTORE_DB_SECONDS);
+		return checkResult.get(0).getStandardOutput().contains(SYNCHRONIZED_FILE_MARK);
 	}
 
 	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase) throws InterruptedException {
 		final String target = "/tmp/" + UUID.randomUUID().toString();
 		final String[] command = new String[] { "mkdir", "-p", target };
-		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, 15);
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, 15);
 		return target;
 	}
 
@@ -118,17 +119,20 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 						"--ftp-user=" + kettleRepositorySpec.getRepositoryUsername(),
 						"--ftp-password=" + kettleRepositorySpec.getRepositoryPassword(),
 						kettleRepositorySpec.getRepositoryUrl() };
-				StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
+						TIMEOUT_RESTORE_DB_SECONDS);
 			} else {
 				final String[] command = new String[] { "wget", "-O", targetFile,
 						"--http-user=" + kettleRepositorySpec.getRepositoryUsername(),
 						"--http-password=" + kettleRepositorySpec.getRepositoryPassword(),
 						kettleRepositorySpec.getRepositoryUrl() };
-				StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
+						TIMEOUT_RESTORE_DB_SECONDS);
 			}
 		} else {
 			final String[] command = new String[] { "wget", "-O", targetFile, kettleRepositorySpec.getRepositoryUrl() };
-			StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+			StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
+					TIMEOUT_RESTORE_DB_SECONDS);
 		}
 		return targetFile;
 	}
@@ -176,17 +180,18 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		final String script = "#!/bin/bash\ncat " + dumpPath + " | PGPASSWORD="
 				+ kettleRepository.getSpec().getPassword() + " psql -h localhost -U "
 				+ kettleRepository.getSpec().getUsername() + " " + kettleRepository.getSpec().getDatabaseName() + "\n";
-		StaticUtils.saveStringToFileOnPod(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
+		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
 		final String[] commandChmod = new String[] { "chmod", "+x", TMP_LOAD_DB_SCRIPT_PATH };
-		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, commandChmod, TIMEOUT_RESTORE_DB_SECONDS);
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, commandChmod,
+				TIMEOUT_RESTORE_DB_SECONDS);
 		final String[] command = new String[] { TMP_LOAD_DB_SCRIPT_PATH };
-		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
 	}
 
 	private void setStatusSynchronized(final KettleRepository kettleRepository, final Deployment deploymentDatabase)
 			throws InterruptedException, IOException {
 		final String payload = new Date().toString();
-		StaticUtils.saveStringToFileOnPod(kubernetesClient, deploymentDatabase, payload, SYNCHRONIZED_PATH);
+		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, payload, SYNCHRONIZED_PATH);
 		kettleRepository.getStatus().setReturnCode(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString());
 	}
 

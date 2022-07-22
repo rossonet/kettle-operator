@@ -63,6 +63,7 @@ public class IngressIdeResource extends CRUKubernetesDependentResource<Ingress, 
 			final HTTPIngressPath path = new HTTPIngressPath();
 			path.setPath(kettleIde.getSpec().getPath());
 			path.setPathType("Prefix");
+			path.setBackend(backend);
 			paths.add(path);
 			httpRule.setPaths(paths);
 			ruleIde.setHttp(httpRule);

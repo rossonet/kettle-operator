@@ -3,6 +3,7 @@ package net.rossonet.operator.model;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,12 @@ import net.rossonet.operator.model.simple.transformation.KettleTransformationSta
 public class StaticUtils {
 
 	private static class ExecPodListener implements ExecListener {
+		private final CountDownLatch execLatch;
+
+		public ExecPodListener(final CountDownLatch execLatch) {
+			this.execLatch = execLatch;
+		}
+
 		@Override
 		public void onClose(final int i, final String s) {
 			logger.info("Shell Closing with return code " + i);
@@ -117,7 +124,6 @@ public class StaticUtils {
 	}
 
 	public static final String DATA_MANAGED_BY = "kettle-operator";
-	private static final CountDownLatch execLatch = new CountDownLatch(1);
 	public static final String FILE = "file://";
 
 	public static final String FTP = "ftp://";
@@ -192,9 +198,10 @@ public class StaticUtils {
 		return Arrays.asList(new String[] { "uname -a" });
 	}
 
-	public static ExecResult execCommandOnPod(final KubernetesClient kubernetesClient,
+	public static List<ExecResult> execCommandOnDeployment(final KubernetesClient kubernetesClient,
 			final Deployment deploymentDatabase, final String[] command, final long timeoutCommandSeconds)
 			throws InterruptedException {
+		final List<ExecResult> result = new ArrayList<>();
 		final ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
 		final ByteArrayOutputStream standardError = new ByteArrayOutputStream();
 		final String namespace = deploymentDatabase.getMetadata().getNamespace();
@@ -205,40 +212,43 @@ public class StaticUtils {
 			logger.fine("pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
 			podNameSelected = pod.getMetadata().getName();
 			logger.finer(pod.toString() + "\n");
+			final CountDownLatch execLatch = new CountDownLatch(1);
+			logger.fine("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
+			final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected)
+					.writingOutput(standardOutput).writingError(standardError).withTTY()
+					.usingListener(new ExecPodListener(execLatch)).exec(command);
+			final boolean latchTerminationStatus = execLatch.await(timeoutCommandSeconds, TimeUnit.SECONDS);
+			if (!latchTerminationStatus) {
+				logger.warning("Latch could not terminate within specified time");
+			}
+			final String output = new String(standardOutput.toByteArray());
+			final String error = new String(standardError.toByteArray());
+			logger.fine("Exec Output: " + output);
+			logger.fine("Exec Error: " + error);
+			execWatch.close();
+			result.add(new ExecResult(command, output, error));
 		}
-		logger.fine("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
-		final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected)
-				.writingOutput(standardOutput).writingError(standardError).withTTY()
-				.usingListener(new ExecPodListener()).exec(command);
-		final boolean latchTerminationStatus = execLatch.await(timeoutCommandSeconds, TimeUnit.SECONDS);
-		if (!latchTerminationStatus) {
-			logger.warning("Latch could not terminate within specified time");
-		}
-		final String output = new String(standardOutput.toByteArray());
-		final String error = new String(standardError.toByteArray());
-		logger.fine("Exec Output: " + output);
-		logger.fine("Exec Error: " + error);
-		execWatch.close();
-		return new ExecResult(command, output, error);
+		return result;
 	}
 
-	public static void saveStringToFileOnPod(final KubernetesClient kubernetesClient,
+	public static void saveStringToFileOnDeployment(final KubernetesClient kubernetesClient,
 			final Deployment deploymentDatabase, final String payload, final String destinationFile)
 			throws IOException {
 		final String namespace = deploymentDatabase.getMetadata().getNamespace();
 		final String podName = deploymentDatabase.getMetadata().getName();
 		String podNameSelected = "NaN";
+		final File tempFile = new File("/tmp/" + UUID.randomUUID().toString());
+		tempFile.deleteOnExit();
 		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
 				.list().getItems()) {
 			logger.fine("pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
 			podNameSelected = pod.getMetadata().getName();
 			logger.finer(pod.toString() + "\n");
+
+			Files.write(payload.getBytes(), tempFile);
+			kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected).file(destinationFile)
+					.upload(tempFile.toPath());
 		}
-		final File tempFile = new File("/tmp/" + UUID.randomUUID().toString());
-		tempFile.deleteOnExit();
-		Files.write(payload.getBytes(), tempFile);
-		kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected).file(destinationFile)
-				.upload(tempFile.toPath());
 		tempFile.delete();
 	}
 
