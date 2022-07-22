@@ -35,12 +35,6 @@ public class KettleRepositorySpec {
 	@JsonPropertyDescription("Repository username")
 	private String repositoryUsername = null;
 
-	/**
-	 * synchronize schedule notation
-	 */
-	@JsonPropertyDescription("synchronize local disk to remote repository delay in seconds")
-	private Long scheduleDelaySeconds = null;
-
 	/** Database username */
 	@JsonPropertyDescription("Database username")
 	private String username = "rossonet";
@@ -71,10 +65,6 @@ public class KettleRepositorySpec {
 
 	public String getRepositoryUsername() {
 		return repositoryUsername;
-	}
-
-	public Long getScheduleDelaySeconds() {
-		return scheduleDelaySeconds;
 	}
 
 	public String getUsername() {
@@ -109,10 +99,6 @@ public class KettleRepositorySpec {
 		this.repositoryUsername = repositoryUsername;
 	}
 
-	public void setScheduleDelaySeconds(final Long scheduleDelaySeconds) {
-		this.scheduleDelaySeconds = scheduleDelaySeconds;
-	}
-
 	public void setUsername(final String username) {
 		this.username = username;
 	}
@@ -144,11 +130,6 @@ public class KettleRepositorySpec {
 		if (repositorySshCertificate != null) {
 			builder.append("repositorySshCertificate=");
 			builder.append(repositorySshCertificate);
-			builder.append(", ");
-		}
-		if (scheduleDelaySeconds != null) {
-			builder.append("scheduleDelaySeconds=");
-			builder.append(scheduleDelaySeconds);
 			builder.append(", ");
 		}
 		if (username != null) {

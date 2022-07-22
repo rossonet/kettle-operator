@@ -1,11 +1,16 @@
 package net.rossonet.operator.model;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import com.google.common.io.Files;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -190,7 +195,7 @@ public class StaticUtils {
 		String podNameSelected = "NaN";
 		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
 				.list().getItems()) {
-			logger.fine("* pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
+			logger.fine("pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
 			podNameSelected = pod.getMetadata().getName();
 			logger.finer(pod.toString() + "\n");
 		}
@@ -205,6 +210,26 @@ public class StaticUtils {
 		logger.fine("Exec Output: {} " + standardOutput.toString());
 		execWatch.close();
 		return new ExecResult(command, standardOutput.toString(), standardError.toString());
+	}
+
+	public static void saveStringToFileOnPod(final KubernetesClient kubernetesClient,
+			final Deployment deploymentDatabase, final String payload, final String destinationFile)
+			throws IOException {
+		final String namespace = deploymentDatabase.getMetadata().getNamespace();
+		final String podName = deploymentDatabase.getMetadata().getName();
+		String podNameSelected = "NaN";
+		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
+				.list().getItems()) {
+			logger.fine("pod " + pod.getMetadata().getName() + " in namespace " + pod.getMetadata().getNamespace());
+			podNameSelected = pod.getMetadata().getName();
+			logger.finer(pod.toString() + "\n");
+		}
+		final File tempFile = new File("/tmp/" + UUID.randomUUID().toString());
+		tempFile.deleteOnExit();
+		Files.write(payload.getBytes(), tempFile);
+		kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected).file(destinationFile)
+				.upload(tempFile.toPath());
+		tempFile.delete();
 	}
 
 	private StaticUtils() {

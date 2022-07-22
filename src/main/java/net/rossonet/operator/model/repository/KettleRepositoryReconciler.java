@@ -1,5 +1,7 @@
 package net.rossonet.operator.model.repository;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -140,17 +142,19 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	}
 
 	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
-			final String dumpPath) throws InterruptedException {
-		final String[] command = new String[] { "cat", dumpPath, "|",
-				"PGPASSWORD=" + kettleRepository.getSpec().getPassword(), "psql", "-h", "localhost", "-U",
-				kettleRepository.getSpec().getUsername(), kettleRepository.getSpec().getDatabaseName() };
+			final String dumpPath) throws InterruptedException, IOException {
+		final String script = "cat " + dumpPath + " | PGPASSWORD=" + kettleRepository.getSpec().getPassword()
+				+ " psql -h localhost -U " + kettleRepository.getSpec().getUsername() + " "
+				+ kettleRepository.getSpec().getDatabaseName() + "\n";
+		StaticUtils.saveStringToFileOnPod(kubernetesClient, deploymentDatabase, script, "/tmp/load_db.sh");
+		final String[] command = new String[] { "bash", "/tmp/load_db.sh" };
 		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
 	}
 
 	private void setStatusSynchronized(final KettleRepository kettleRepository, final Deployment deploymentDatabase)
-			throws InterruptedException {
-		final String[] command = new String[] { "date", ">", "/SYNCHRONIZED" };
-		StaticUtils.execCommandOnPod(kubernetesClient, deploymentDatabase, command, 60);
+			throws InterruptedException, IOException {
+		final String payload = new Date().toString();
+		StaticUtils.saveStringToFileOnPod(kubernetesClient, deploymentDatabase, payload, "/SYNCHRONIZED");
 		kettleRepository.getStatus().setReturnCode(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString());
 	}
 
