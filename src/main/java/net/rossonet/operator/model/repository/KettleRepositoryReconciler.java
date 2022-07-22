@@ -135,6 +135,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	private String downloadDumpDatabaseFromGit(final Deployment deploymentDatabase,
 			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException {
+		@SuppressWarnings("unused")
 		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
 		// TODO Auto-generated method stub
 		return null;
@@ -142,6 +143,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	private String downloadDumpDatabaseFromS3(final Deployment deploymentDatabase,
 			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException {
+		@SuppressWarnings("unused")
 		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
 		// TODO Auto-generated method stub
 		return null;

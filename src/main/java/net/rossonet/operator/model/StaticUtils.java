@@ -33,13 +33,20 @@ public class StaticUtils {
 	private static class ExecPodListener implements ExecListener {
 		@Override
 		public void onClose(final int i, final String s) {
-			logger.info("Shell Closing");
+			logger.info("Shell Closing with retunr code " + i);
+			logger.info(s);
 			execLatch.countDown();
 		}
 
 		@Override
 		public void onFailure(final Throwable t, final Response failureResponse) {
-			logger.info("Some error encountered");
+			logger.warning("Some error encountered");
+			logger.warning(LogUtils.stackTraceToString(t));
+			try {
+				logger.warning(failureResponse.body());
+			} catch (final IOException e) {
+				logger.warning(LogUtils.stackTraceToString(e));
+			}
 			execLatch.countDown();
 		}
 
@@ -199,17 +206,20 @@ public class StaticUtils {
 			podNameSelected = pod.getMetadata().getName();
 			logger.finer(pod.toString() + "\n");
 		}
-		logger.info("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
+		logger.fine("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
 		final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected)
-				.writingOutput(standardOutput).writingError(standardError).usingListener(new ExecPodListener())
-				.exec(command);
+				.writingOutput(standardOutput).writingError(standardError).withTTY()
+				.usingListener(new ExecPodListener()).exec(command);
 		final boolean latchTerminationStatus = execLatch.await(timeoutCommandSeconds, TimeUnit.SECONDS);
 		if (!latchTerminationStatus) {
 			logger.warning("Latch could not terminate within specified time");
 		}
-		logger.fine("Exec Output: {} " + standardOutput.toString());
+		final String output = new String(standardOutput.toByteArray());
+		final String error = new String(standardError.toByteArray());
+		logger.fine("Exec Output: " + output);
+		logger.fine("Exec Error: " + error);
 		execWatch.close();
-		return new ExecResult(command, standardOutput.toString(), standardError.toString());
+		return new ExecResult(command, output, error);
 	}
 
 	public static void saveStringToFileOnPod(final KubernetesClient kubernetesClient,

@@ -1,12 +1,17 @@
 package net.rossonet.operator.model.ide;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.networking.v1.HTTPIngressPath;
+import io.fabric8.kubernetes.api.model.networking.v1.HTTPIngressRuleValue;
 import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.api.model.networking.v1.IngressBackend;
+import io.fabric8.kubernetes.api.model.networking.v1.IngressRule;
 import io.fabric8.kubernetes.api.model.networking.v1.IngressServiceBackend;
 import io.fabric8.kubernetes.api.model.networking.v1.IngressSpec;
 import io.fabric8.kubernetes.api.model.networking.v1.ServiceBackendPort;
@@ -41,13 +46,27 @@ public class IngressIdeResource extends CRUKubernetesDependentResource<Ingress, 
 			final IngressSpec spec = new IngressSpec();
 			final IngressBackend backend = new IngressBackend();
 			final IngressServiceBackend service = new IngressServiceBackend();
-			service.setName("test");
+			service.setName(kettleIde.getMetadata().getName());
 			final ServiceBackendPort servicePort = new ServiceBackendPort();
 			servicePort.setNumber(80);
 			service.setPort(servicePort);
 			backend.setService(service);
 			spec.setDefaultBackend(backend);
 			ingress.setSpec(spec);
+			final List<IngressRule> rules = new ArrayList<>();
+			final IngressRule ruleIde = new IngressRule();
+			if (kettleIde.getSpec().getHost() != null) {
+				ruleIde.setHost(kettleIde.getSpec().getHost());
+			}
+			final HTTPIngressRuleValue httpRule = new HTTPIngressRuleValue();
+			final List<HTTPIngressPath> paths = new ArrayList<>();
+			final HTTPIngressPath path = new HTTPIngressPath();
+			path.setPath(kettleIde.getSpec().getPath());
+			paths.add(path);
+			httpRule.setPaths(paths);
+			ruleIde.setHttp(httpRule);
+			rules.add(ruleIde);
+			spec.setRules(rules);
 			logger.info("actual ingress " + ingress);
 		} catch (final Exception e) {
 			logger.severe(LogUtils.stackTraceToString(e));

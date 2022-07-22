@@ -1,0 +1,8 @@
+apiVersion: kettle.rossonet.net/v1
+kind: KettleIde
+metadata:
+  name: ide-example1
+  namespace: test-namespace
+spec:
+  #image: image-value
+  path: /ide1
