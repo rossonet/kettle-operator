@@ -194,7 +194,7 @@ public class StaticUtils {
 			podNameSelected = pod.getMetadata().getName();
 			logger.finer(pod.toString() + "\n");
 		}
-		logger.info("**** try '" + command + "' to " + podName + " in namespace " + namespace);
+		logger.info("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
 		final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected)
 				.writingOutput(standardOutput).writingError(standardError).usingListener(new ExecPodListener())
 				.exec(command);
