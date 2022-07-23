@@ -24,6 +24,23 @@
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/operator.yaml
 ```
 
+### Examples
+
+Repository
+```
+kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/repository.yaml
+```
+
+Spoon Kettle IDE
+```
+kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/spoon-ide.yaml
+```
+
+Transformation Job
+```
+kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/transformation.yaml
+```
+
 ![alt text](https://app.rossonet.net/wp-content/uploads/2021/10/rossonet-logo_280_115.png "Rossonet")
 
 [https://www.rossonet.net](https://www.rossonet.net)
