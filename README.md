@@ -10,15 +10,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f3ae38d406804dfc844d94bcff9cc9a7)](https://www.codacy.com/gh/rossonet/kettle-operator/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=rossonet/kettle-operator&amp;utm_campaign=Badge_Grade)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md) 
 
-## Rossonet
-
-### Framework Java
-
-[https://javaoperatorsdk.io/](https://javaoperatorsdk.io/)
-
-[examples](https://github.com/java-operator-sdk/java-operator-sdk/tree/main/sample-operators)
-
-### install on Kubernetes
+### Install on Kubernetes
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/operator.yaml
@@ -40,6 +32,13 @@ Transformation Job
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/transformation.yaml
 ```
+
+### Framework Java to make the Kubernetes Operator
+
+[https://javaoperatorsdk.io/](https://javaoperatorsdk.io/)
+
+[examples](https://github.com/java-operator-sdk/java-operator-sdk/tree/main/sample-operators)
+
 
 ![alt text](https://app.rossonet.net/wp-content/uploads/2021/10/rossonet-logo_280_115.png "Rossonet")
 

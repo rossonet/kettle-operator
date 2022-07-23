@@ -99,6 +99,10 @@ public class StaticUtils {
 			this.execLatch = execLatch;
 		}
 
+		public CountDownLatch getExecLatch() {
+			return execLatch;
+		}
+
 		@Override
 		public void onClose(final int i, final String s) {
 			logger.info("Shell Closing with return code " + i);
@@ -262,24 +266,28 @@ public class StaticUtils {
 
 	private static ExecResult execOnPod(final KubernetesClient kubernetesClient, final String namespace,
 			final String podName, final String[] command, final long timeoutCommandSeconds)
-			throws InterruptedException {
+			throws InterruptedException, IOException {
 		final ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
 		final ByteArrayOutputStream standardError = new ByteArrayOutputStream();
 		logger.fine("pod " + podName + " in namespace " + podName);
 		logger.finer(podName + "\n");
-		final CountDownLatch execLatch = new CountDownLatch(1);
 		logger.fine("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
+		final ExecPodListener listener = new ExecPodListener(new CountDownLatch(1));
 		final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podName)
-				.writingOutput(standardOutput).writingError(standardError).withTTY()
-				.usingListener(new ExecPodListener(execLatch)).exec(command);
-		final boolean latchTerminationStatus = execLatch.await(timeoutCommandSeconds, TimeUnit.SECONDS);
+				.writingOutput(standardOutput).writingError(standardError)// .withTTY()
+				.usingListener(listener).exec(command);
+		final boolean latchTerminationStatus = listener.getExecLatch().await(timeoutCommandSeconds, TimeUnit.SECONDS);
 		if (!latchTerminationStatus) {
 			logger.warning("Latch could not terminate within specified time");
 		}
+		standardOutput.flush();
+		standardError.flush();
 		final String output = new String(standardOutput.toByteArray());
 		final String error = new String(standardError.toByteArray());
 		logger.fine("Exec Output: " + output);
 		logger.fine("Exec Error: " + error);
+		standardOutput.close();
+		standardError.close();
 		execWatch.close();
 		return new ExecResult(command, output, error);
 	}
