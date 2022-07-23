@@ -270,8 +270,7 @@ public class StaticUtils {
 		final ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
 		final ByteArrayOutputStream standardError = new ByteArrayOutputStream();
 		logger.fine("pod " + podName + " in namespace " + podName);
-		logger.finer(podName + "\n");
-		logger.fine("**** try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
+		logger.fine("try '" + Arrays.toString(command) + "' to " + podName + " in namespace " + namespace);
 		final ExecPodListener listener = new ExecPodListener(new CountDownLatch(1));
 		final ExecWatch execWatch = kubernetesClient.pods().inNamespace(namespace).withName(podName)
 				.writingOutput(standardOutput).writingError(standardError)// .withTTY()

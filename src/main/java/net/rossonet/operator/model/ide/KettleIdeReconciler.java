@@ -33,7 +33,7 @@ public class KettleIdeReconciler implements Reconciler<KettleIde> {
 	@Override
 	public UpdateControl<KettleIde> reconcile(final KettleIde resource, final Context<KettleIde> context) {
 		try {
-			logger.info("reconciler  " + resource + " -> " + context);
+			logger.fine("reconciler  " + resource + " -> " + context);
 			final String name = context.getSecondaryResource(Deployment.class).get().getMetadata().getName();
 			resource.setStatus(StaticUtils.createKettleIdeStatus(name));
 			return UpdateControl.patchStatus(resource);

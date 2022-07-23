@@ -44,7 +44,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	public UpdateControl<KettleRepository> reconcile(final KettleRepository resource,
 			final Context<KettleRepository> context) {
 		try {
-			logger.info("reconciler  " + resource + " -> " + context);
+			logger.fine("reconciler  " + resource + " -> " + context);
 			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
 			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
 			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
