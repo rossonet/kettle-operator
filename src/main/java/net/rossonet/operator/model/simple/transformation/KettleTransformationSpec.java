@@ -10,6 +10,8 @@ import net.rossonet.operator.model.simple.KettleWork;
 
 public class KettleTransformationSpec {
 
+	@JsonPropertyDescription("Kettle Repository managed by Kubernetes")
+	private String definedRepository = null;
 	/**
 	 * The repository directory that contains the transformation, including the
 	 * leading slash
@@ -17,15 +19,18 @@ public class KettleTransformationSpec {
 	@JsonPropertyDescription("The repository directory that contains the transformation, including the leading slash")
 	@NotNull
 	private String dir = null;
+
 	/** Exports all repository objects to one XML file */
 	@JsonPropertyDescription("Exports all repository objects to one XML file")
 	private String exprep = null;
+
 	/**
 	 * If you are calling a local KTR file, this is the filename, including the path
 	 * if it is not in the local directory
 	 */
 	@JsonPropertyDescription("If you are calling a local KTR file, this is the filename, including the path if it is not in the local directory")
 	private String file = null;
+
 	@JsonPropertyDescription("the Docker image default is " + KettleWork.DEFAULT_IMAGE)
 	private String image = KettleWork.DEFAULT_IMAGE;
 
@@ -41,7 +46,6 @@ public class KettleTransformationSpec {
 	/** Lists the available repositories */
 	@JsonPropertyDescription("Lists the available repositories")
 	private String listrep = null;
-
 	/**
 	 * Lists the transformations in the specified repository directory
 	 */
@@ -50,6 +54,7 @@ public class KettleTransformationSpec {
 	/** A local filename to write log output to */
 	@JsonPropertyDescription("A local filename to write log output to")
 	private String logfile = null;
+
 	/**
 	 * Prevents Pan from logging into a repository. If you have set the
 	 * KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD environment variables,
@@ -59,6 +64,7 @@ public class KettleTransformationSpec {
 	 */
 	@JsonPropertyDescription("Prevents Pan from logging into a repository. If you have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD environment variables, then this option will enable you to prevent Pan from logging into the specified repository, assuming you would like to execute a local KTR file instead.")
 	private String norep = null;
+
 	/**
 	 * Set a named parameter in a name=value format. For example: -param:FOO=bar
 	 */
@@ -67,6 +73,7 @@ public class KettleTransformationSpec {
 	/** Repository password */
 	@JsonPropertyDescription("Repository password")
 	private String pass = null;
+
 	/**
 	 * Enterprise or database repository name, if you are using one
 	 */
@@ -86,6 +93,12 @@ public class KettleTransformationSpec {
 	/** Shows the version, revision, and build date */
 	@JsonPropertyDescription("Shows the version, revision, and build date")
 	private String version = null;
+	@JsonPropertyDescription("XML with repositories configuration")
+	private String xmlRepository = null;
+
+	public String getDefinedRepository() {
+		return definedRepository;
+	}
 
 	public String getDir() {
 		return dir;
@@ -153,6 +166,14 @@ public class KettleTransformationSpec {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public String getXmlRepository() {
+		return xmlRepository;
+	}
+
+	public void setDefinedRepository(final String definedRepository) {
+		this.definedRepository = definedRepository;
 	}
 
 	public void setDir(final String dir) {
@@ -223,12 +244,51 @@ public class KettleTransformationSpec {
 		this.version = version;
 	}
 
+	public void setXmlRepository(final String xmlRepository) {
+		this.xmlRepository = xmlRepository;
+	}
+
 	@Override
 	public String toString() {
-		return "KettleTransformationSpec [dir=" + dir + ", exprep=" + exprep + ", file=" + file + ", image=" + image
-				+ ", level=" + level + ", listdir=" + listdir + ", listrep=" + listrep + ", listtrans=" + listtrans
-				+ ", logfile=" + logfile + ", norep=" + norep + ", param=" + Arrays.toString(param) + ", rep=" + rep
-				+ ", safemode=" + safemode + ", trans=" + trans + ", user=" + user + ", version=" + version + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("KettleTransformationSpec [definedRepository=");
+		builder.append(definedRepository);
+		builder.append(", dir=");
+		builder.append(dir);
+		builder.append(", exprep=");
+		builder.append(exprep);
+		builder.append(", file=");
+		builder.append(file);
+		builder.append(", image=");
+		builder.append(image);
+		builder.append(", level=");
+		builder.append(level);
+		builder.append(", listdir=");
+		builder.append(listdir);
+		builder.append(", listrep=");
+		builder.append(listrep);
+		builder.append(", listtrans=");
+		builder.append(listtrans);
+		builder.append(", logfile=");
+		builder.append(logfile);
+		builder.append(", norep=");
+		builder.append(norep);
+		builder.append(", param=");
+		builder.append(Arrays.toString(param));
+		builder.append(", rep=");
+		builder.append(rep);
+		builder.append(", safemode=");
+		builder.append(safemode);
+		builder.append(", trans=");
+		builder.append(trans);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", version=");
+		builder.append(version);
+		builder.append(", xmlRepository=");
+		builder.append(xmlRepository);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

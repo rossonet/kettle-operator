@@ -8,6 +8,8 @@ import net.rossonet.operator.model.simple.KettleWork;
 
 public class CronKettleJobSpec {
 
+	@JsonPropertyDescription("Kettle Repository managed by Kubernetes")
+	private String definedRepository = null;
 	/**
 	 * The repository directory that contains the job, including the leading slash
 	 */
@@ -21,24 +23,29 @@ public class CronKettleJobSpec {
 	 */
 	@JsonPropertyDescription("Exports all linked resources of the specified job. The argument is the name of a ZIP file.")
 	private String export = null;
+
 	/**
 	 * If you are calling a local KJB file, this is the filename, including the path
 	 * if it is not in the local directory
 	 */
 	@JsonPropertyDescription("If you are calling a local KJB file, this is the filename, including the path if it is not in the local directory")
 	private String file = null;
+
 	@JsonPropertyDescription("the Docker image default is " + KettleWork.DEFAULT_IMAGE)
-	private final String image = KettleWork.DEFAULT_IMAGE;
+	private String image = KettleWork.DEFAULT_IMAGE;
+
 	/**
 	 * The name of the job (as it appears in the repository) to launch
 	 */
 	@JsonPropertyDescription("The name of the job (as it appears in the repository) to launch")
 	private String job = null;
+
 	/**
 	 * The logging level (Basic, Detailed, Debug, Rowlevel, Error, Nothing)
 	 */
 	@JsonPropertyDescription("The logging level (Basic, Detailed, Debug, Rowlevel, Error, Nothing)")
 	private String level = null;
+
 	/**
 	 * Lists the sub-directories within the specified repository directory
 	 */
@@ -62,6 +69,7 @@ public class CronKettleJobSpec {
 	 */
 	@JsonPropertyDescription("Prevents Kitchen from logging into a repository. If you have set the KETTLE_REPOSITORY, KETTLE_USER, and KETTLE_PASSWORD environment variables, then this option will enable you to prevent Kitchen from logging into the specified repository, assuming you would like to execute a local KTR file instead.")
 	private String norep = null;
+
 	/** Set a named parameter in a name=value format. For */
 	@JsonPropertyDescription("Set a named parameter in a name=value format. For")
 	private String param = null;
@@ -85,6 +93,12 @@ public class CronKettleJobSpec {
 	/** Shows the version, revision, and build date */
 	@JsonPropertyDescription("Shows the version, revision, and build date")
 	private String version = null;
+	@JsonPropertyDescription("XML with repositories configuration")
+	private String xmlRepository = null;
+
+	public String getDefinedRepository() {
+		return definedRepository;
+	}
 
 	public String getDir() {
 		return dir;
@@ -154,6 +168,14 @@ public class CronKettleJobSpec {
 		return version;
 	}
 
+	public String getXmlRepository() {
+		return xmlRepository;
+	}
+
+	public void setDefinedRepository(final String definedRepository) {
+		this.definedRepository = definedRepository;
+	}
+
 	public void setDir(final String dir) {
 		this.dir = dir;
 	}
@@ -164,6 +186,10 @@ public class CronKettleJobSpec {
 
 	public void setFile(final String file) {
 		this.file = file;
+	}
+
+	public void setImage(final String image) {
+		this.image = image;
 	}
 
 	public void setJob(final String job) {
@@ -218,12 +244,51 @@ public class CronKettleJobSpec {
 		this.version = version;
 	}
 
+	public void setXmlRepository(final String xmlRepository) {
+		this.xmlRepository = xmlRepository;
+	}
+
 	@Override
 	public String toString() {
-		return "CronKettleJobSpec [schedule=" + schedule + ", dir=" + dir + ", export=" + export + ", file=" + file
-				+ ", image=" + image + ", job=" + job + ", level=" + level + ", listdir=" + listdir + ", listjob="
-				+ listjob + ", listrep=" + listrep + ", logfile=" + logfile + ", norep=" + norep + ", param=" + param
-				+ ", rep=" + rep + ", user=" + user + ", version=" + version + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("CronKettleJobSpec [definedRepository=");
+		builder.append(definedRepository);
+		builder.append(", dir=");
+		builder.append(dir);
+		builder.append(", export=");
+		builder.append(export);
+		builder.append(", file=");
+		builder.append(file);
+		builder.append(", image=");
+		builder.append(image);
+		builder.append(", job=");
+		builder.append(job);
+		builder.append(", level=");
+		builder.append(level);
+		builder.append(", listdir=");
+		builder.append(listdir);
+		builder.append(", listjob=");
+		builder.append(listjob);
+		builder.append(", listrep=");
+		builder.append(listrep);
+		builder.append(", logfile=");
+		builder.append(logfile);
+		builder.append(", norep=");
+		builder.append(norep);
+		builder.append(", param=");
+		builder.append(param);
+		builder.append(", rep=");
+		builder.append(rep);
+		builder.append(", schedule=");
+		builder.append(schedule);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", version=");
+		builder.append(version);
+		builder.append(", xmlRepository=");
+		builder.append(xmlRepository);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

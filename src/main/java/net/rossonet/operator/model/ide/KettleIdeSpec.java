@@ -1,14 +1,24 @@
 package net.rossonet.operator.model.ide;
 
+import java.util.Arrays;
+
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
 import net.rossonet.operator.model.simple.KettleWork;
 
 public class KettleIdeSpec {
 
+	@JsonPropertyDescription("Ingress hostname")
 	private String host = null;
 
+	@JsonPropertyDescription("Docker image")
 	private String image = KettleWork.DEFAULT_IDE_IMAGE;
 
+	@JsonPropertyDescription("Ingress path")
 	private String path = "/";
+
+	@JsonPropertyDescription("Repositories managed by this ide")
+	private String[] repositories = null;
 
 	public String getHost() {
 		return host;
@@ -20,6 +30,10 @@ public class KettleIdeSpec {
 
 	public String getPath() {
 		return path;
+	}
+
+	public String[] getRepositories() {
+		return repositories;
 	}
 
 	public void setHost(final String host) {
@@ -34,26 +48,14 @@ public class KettleIdeSpec {
 		this.path = path;
 	}
 
+	public void setRepositories(final String[] repositories) {
+		this.repositories = repositories;
+	}
+
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("KettleIdeSpec [");
-		if (image != null) {
-			builder.append("image=");
-			builder.append(image);
-			builder.append(", ");
-		}
-		if (path != null) {
-			builder.append("path=");
-			builder.append(path);
-			builder.append(", ");
-		}
-		if (host != null) {
-			builder.append("host=");
-			builder.append(host);
-		}
-		builder.append("]");
-		return builder.toString();
+		return "KettleIdeSpec [host=" + host + ", image=" + image + ", path=" + path + ", repositories="
+				+ Arrays.toString(repositories) + "]";
 	}
 
 }

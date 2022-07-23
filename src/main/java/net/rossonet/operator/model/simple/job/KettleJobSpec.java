@@ -8,13 +8,15 @@ import net.rossonet.operator.model.simple.KettleWork;
 
 public class KettleJobSpec {
 
+	@JsonPropertyDescription("Kettle Repository managed by Kubernetes")
+	private String definedRepository = null;
+
 	/**
 	 * The repository directory that contains the job, including the leading slash
 	 */
 	@JsonPropertyDescription("The repository directory that contains the job, including the leading slash")
 	@NotNull
 	private String dir = null;
-
 	/**
 	 * Exports all linked resources of the specified job. The argument is the name
 	 * of a ZIP file.
@@ -28,7 +30,8 @@ public class KettleJobSpec {
 	@JsonPropertyDescription("If you are calling a local KJB file, this is the filename, including the path if it is not in the local directory")
 	private String file = null;
 	@JsonPropertyDescription("the Docker image default is " + KettleWork.DEFAULT_IMAGE)
-	private final String image = KettleWork.DEFAULT_IMAGE;
+	private String image = KettleWork.DEFAULT_IMAGE;
+
 	/**
 	 * The name of the job (as it appears in the repository) to launch
 	 */
@@ -76,9 +79,16 @@ public class KettleJobSpec {
 	/** Repository username */
 	@JsonPropertyDescription("Repository username")
 	private String user = null;
+
 	/** Shows the version, revision, and build date */
 	@JsonPropertyDescription("Shows the version, revision, and build date")
 	private String version = null;
+	@JsonPropertyDescription("XML with repositories configuration")
+	private String xmlRepository = null;
+
+	public String getDefinedRepository() {
+		return definedRepository;
+	}
 
 	public String getDir() {
 		return dir;
@@ -144,6 +154,14 @@ public class KettleJobSpec {
 		return version;
 	}
 
+	public String getXmlRepository() {
+		return xmlRepository;
+	}
+
+	public void setDefinedRepository(final String definedRepository) {
+		this.definedRepository = definedRepository;
+	}
+
 	public void setDir(final String dir) {
 		this.dir = dir;
 	}
@@ -154,6 +172,10 @@ public class KettleJobSpec {
 
 	public void setFile(final String file) {
 		this.file = file;
+	}
+
+	public void setImage(final String image) {
+		this.image = image;
 	}
 
 	public void setJob(final String job) {
@@ -204,12 +226,49 @@ public class KettleJobSpec {
 		this.version = version;
 	}
 
+	public void setXmlRepository(final String xmlRepository) {
+		this.xmlRepository = xmlRepository;
+	}
+
 	@Override
 	public String toString() {
-		return "KettleJobSpec [image=" + image + ", rep=" + rep + ", user=" + user + ", job=" + job + ", dir=" + dir
-				+ ", file=" + file + ", level=" + level + ", logfile=" + logfile + ", listdir=" + listdir + ", listjob="
-				+ listjob + ", listrep=" + listrep + ", export=" + export + ", norep=" + norep + ", version=" + version
-				+ ", param=" + param + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("KettleJobSpec [definedRepository=");
+		builder.append(definedRepository);
+		builder.append(", dir=");
+		builder.append(dir);
+		builder.append(", export=");
+		builder.append(export);
+		builder.append(", file=");
+		builder.append(file);
+		builder.append(", image=");
+		builder.append(image);
+		builder.append(", job=");
+		builder.append(job);
+		builder.append(", level=");
+		builder.append(level);
+		builder.append(", listdir=");
+		builder.append(listdir);
+		builder.append(", listjob=");
+		builder.append(listjob);
+		builder.append(", listrep=");
+		builder.append(listrep);
+		builder.append(", logfile=");
+		builder.append(logfile);
+		builder.append(", norep=");
+		builder.append(norep);
+		builder.append(", param=");
+		builder.append(param);
+		builder.append(", rep=");
+		builder.append(rep);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", version=");
+		builder.append(version);
+		builder.append(", xmlRepository=");
+		builder.append(xmlRepository);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

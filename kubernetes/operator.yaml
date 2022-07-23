@@ -128,6 +128,9 @@ spec:
         properties:
           spec:
             properties:
+              definedRepository:
+                description: Kettle Repository managed by Kubernetes
+                type: string
               dir:
                 description: "The repository directory that contains the job, including\
                   \ the leading slash"
@@ -190,6 +193,9 @@ spec:
               version:
                 description: "Shows the version, revision, and build date"
                 type: string
+              xmlRepository:
+                description: XML with repositories configuration
+                type: string
             required:
             - dir
             - schedule
@@ -230,6 +236,9 @@ spec:
         properties:
           spec:
             properties:
+              definedRepository:
+                description: Kettle Repository managed by Kubernetes
+                type: string
               dir:
                 description: "The repository directory that contains the transformation,\
                   \ including the leading slash"
@@ -297,6 +306,9 @@ spec:
               version:
                 description: "Shows the version, revision, and build date"
                 type: string
+              xmlRepository:
+                description: XML with repositories configuration
+                type: string
             required:
             - dir
             - schedule
@@ -338,11 +350,19 @@ spec:
           spec:
             properties:
               host:
+                description: Ingress hostname
                 type: string
               image:
+                description: Docker image
                 type: string
               path:
+                description: Ingress path
                 type: string
+              repositories:
+                description: Repositories managed by this ide
+                items:
+                  type: string
+                type: array
             type: object
           status:
             properties:
@@ -380,6 +400,9 @@ spec:
         properties:
           spec:
             properties:
+              definedRepository:
+                description: Kettle Repository managed by Kubernetes
+                type: string
               dir:
                 description: "The repository directory that contains the job, including\
                   \ the leading slash"
@@ -438,6 +461,9 @@ spec:
                 type: string
               version:
                 description: "Shows the version, revision, and build date"
+                type: string
+              xmlRepository:
+                description: XML with repositories configuration
                 type: string
             required:
             - dir
@@ -548,6 +574,9 @@ spec:
         properties:
           spec:
             properties:
+              definedRepository:
+                description: Kettle Repository managed by Kubernetes
+                type: string
               dir:
                 description: "The repository directory that contains the transformation,\
                   \ including the leading slash"
@@ -611,6 +640,9 @@ spec:
                 type: string
               version:
                 description: "Shows the version, revision, and build date"
+                type: string
+              xmlRepository:
+                description: XML with repositories configuration
                 type: string
             required:
             - dir
