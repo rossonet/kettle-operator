@@ -33,7 +33,7 @@ Transformation Job
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/transformation.yaml
 ```
 
-### Framework Java to make the Kubernetes Operator
+### Framework Java to make Kubernetes Operators
 
 [https://javaoperatorsdk.io/](https://javaoperatorsdk.io/)
 

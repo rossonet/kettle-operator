@@ -300,7 +300,7 @@ public class StaticUtils {
 	}
 
 	private StaticUtils() {
-		// solo metodi statici
+		// only for static usage
 	}
 
 }
