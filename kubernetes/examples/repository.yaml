@@ -9,4 +9,5 @@ spec:
   username: rossonet
   password: password1
   databaseName: kettle
+  replicas: 3
 

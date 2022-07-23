@@ -17,6 +17,10 @@ public class KettleRepositorySpec {
 	@JsonPropertyDescription("Database password")
 	private String password = "password";
 
+	/** Database replicas */
+	@JsonPropertyDescription("Database replicas")
+	private int replicas = 1;
+
 	/** Repository password */
 	@JsonPropertyDescription("Repository password")
 	private String repositoryPassword = null;
@@ -51,6 +55,10 @@ public class KettleRepositorySpec {
 		return password;
 	}
 
+	public int getReplicas() {
+		return replicas;
+	}
+
 	public String getRepositoryPassword() {
 		return repositoryPassword;
 	}
@@ -81,6 +89,10 @@ public class KettleRepositorySpec {
 
 	public void setPassword(final String password) {
 		this.password = password;
+	}
+
+	public void setReplicas(final int replicas) {
+		this.replicas = replicas;
 	}
 
 	public void setRepositoryPassword(final String repositoryPassword) {
@@ -117,6 +129,9 @@ public class KettleRepositorySpec {
 			builder.append(image);
 			builder.append(", ");
 		}
+		builder.append("replicas=");
+		builder.append(replicas);
+		builder.append(", ");
 		if (repositoryUrl != null) {
 			builder.append("repositoryUrl=");
 			builder.append(repositoryUrl);
@@ -125,11 +140,6 @@ public class KettleRepositorySpec {
 		if (repositoryUsername != null) {
 			builder.append("repositoryUsername=");
 			builder.append(repositoryUsername);
-			builder.append(", ");
-		}
-		if (repositorySshCertificate != null) {
-			builder.append("repositorySshCertificate=");
-			builder.append(repositorySshCertificate);
 			builder.append(", ");
 		}
 		if (username != null) {

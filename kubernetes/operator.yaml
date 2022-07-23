@@ -487,6 +487,9 @@ spec:
               password:
                 description: Database password
                 type: string
+              replicas:
+                description: Database replicas
+                type: integer
               repositoryPassword:
                 description: Repository password
                 type: string

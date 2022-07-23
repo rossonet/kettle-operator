@@ -59,6 +59,7 @@ public class RepositoryResource extends CRUKubernetesDependentResource<Deploymen
 			final LabelSelector selector = new LabelSelector();
 			selector.setMatchLabels(labels);
 			spec.setSelector(selector);
+			spec.setReplicas(kettleRepository.getSpec().getReplicas());
 			final PodTemplateSpec template = new PodTemplateSpec();
 			template.setMetadata(new ObjectMeta());
 			template.getMetadata().setLabels(labels);

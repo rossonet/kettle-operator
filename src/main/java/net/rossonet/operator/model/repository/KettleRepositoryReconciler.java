@@ -1,8 +1,6 @@
 package net.rossonet.operator.model.repository;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -18,7 +16,6 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
-import net.rossonet.operator.model.StaticUtils.ExecResult;
 
 @ControllerConfiguration(dependents = { @Dependent(type = RepositoryResource.class),
 		@Dependent(type = ServiceRepositoryResource.class) })
@@ -29,10 +26,9 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	}
 
 	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
-	private static final String SYNCHRONIZED_FILE_MARK = "SYNCHRONIZED FILE FOUND";
-	private static final String SYNCHRONIZED_PATH = "/SYNCHRONIZED";
+
+	private static final String PATH_CHECK_LOAD_DATABASE = "/load_database";
 	private static final long TIMEOUT_RESTORE_DB_SECONDS = 5 * 60;
-	private static final String TMP_CHECK_SCRIPT_SH = "/tmp/check_script.sh";
 	private static final String TMP_LOAD_DB_SCRIPT_PATH = "/tmp/load_db.sh";
 	private final KubernetesClient kubernetesClient;
 
@@ -42,115 +38,6 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	public KettleRepositoryReconciler(final KubernetesClient kubernetesClient) {
 		this.kubernetesClient = kubernetesClient;
-	}
-
-	private boolean checkSynchronizedFile(final Deployment deploymentDatabase)
-			throws IOException, InterruptedException {
-		final String script = "if [ -f /SYNCHRONIZED ]\nthen\necho '" + SYNCHRONIZED_FILE_MARK
-				+ "'\nelse\necho 'KO'\nfi\n";
-		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_CHECK_SCRIPT_SH);
-		final String[] command = new String[] { "bash", TMP_CHECK_SCRIPT_SH };
-		final List<ExecResult> checkResult = StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase,
-				command, TIMEOUT_RESTORE_DB_SECONDS);
-		return checkResult.get(0).getStandardOutput().contains(SYNCHRONIZED_FILE_MARK);
-	}
-
-	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase) throws InterruptedException {
-		final String target = "/tmp/" + UUID.randomUUID().toString();
-		final String[] command = new String[] { "mkdir", "-p", target };
-		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, 15);
-		return target;
-	}
-
-	private void databaseManagement(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
-			final Service serviceDatabase) {
-		try {
-			if (kettleRepository.getStatus().getReturnCode()
-					.equals(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString())) {
-				if (!checkSynchronizedFile(deploymentDatabase)) {
-					kettleRepository.getStatus()
-							.setReturnCode(KettleRepositoryReconciler.RepositoryStatus.INIT.toString());
-				}
-			}
-			if (kettleRepository.getStatus().getReturnCode()
-					.equals(KettleRepositoryReconciler.RepositoryStatus.INIT.toString())) {
-				String dumpPath = null;
-				final String repositoryUrl = kettleRepository.getSpec().getRepositoryUrl();
-				if (repositoryUrl.startsWith(StaticUtils.HTTP) || repositoryUrl.startsWith(StaticUtils.HTTPS)
-						|| repositoryUrl.startsWith(StaticUtils.FTP)) {
-					logger.severe(repositoryUrl + " is managed by wget");
-					dumpPath = downloadDumpDatabaseFromFtpHttpOrHttps(deploymentDatabase, kettleRepository.getSpec());
-				} else if (repositoryUrl.startsWith(StaticUtils.GIT_HTTP)
-						|| repositoryUrl.startsWith(StaticUtils.GIT_HTTPS)
-						|| repositoryUrl.startsWith(StaticUtils.GIT_SSH)) {
-					logger.severe(repositoryUrl + " is managed by git");
-					dumpPath = downloadDumpDatabaseFromGit(deploymentDatabase, kettleRepository.getSpec());
-				} else if (repositoryUrl.startsWith(StaticUtils.S3)) {
-					logger.severe(repositoryUrl + " is managed by s3 client");
-					dumpPath = downloadDumpDatabaseFromS3(deploymentDatabase, kettleRepository.getSpec());
-				} else if (repositoryUrl.startsWith(StaticUtils.FILE)) {
-					logger.severe(repositoryUrl + " could not to be downloaded");
-					dumpPath = repositoryUrl.substring(StaticUtils.FILE.length());
-				} else {
-					dumpPath = null;
-					logger.severe(repositoryUrl + " not recognized");
-				}
-				if (dumpPath != null) {
-					restoreDatabase(kettleRepository, deploymentDatabase, dumpPath);
-				}
-				setStatusSynchronized(kettleRepository, deploymentDatabase);
-			} else {
-				logger.info("database already loaded, kettleRepository.getStatus().getReturnCode()="
-						+ kettleRepository.getStatus().getReturnCode());
-			}
-		} catch (final Exception e) {
-			logger.severe("Exception in database management " + LogUtils.stackTraceToString(e));
-		}
-	}
-
-	private String downloadDumpDatabaseFromFtpHttpOrHttps(final Deployment deploymentDatabase,
-			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException {
-		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
-		final String targetFile = targetDirectory + "/repository.sql";
-		if (kettleRepositorySpec.getRepositoryUsername() != null
-				&& kettleRepositorySpec.getRepositoryPassword() != null) {
-			if (kettleRepositorySpec.getRepositoryUrl().startsWith(StaticUtils.FTP)) {
-				final String[] command = new String[] { "wget", "-O", targetFile,
-						"--ftp-user=" + kettleRepositorySpec.getRepositoryUsername(),
-						"--ftp-password=" + kettleRepositorySpec.getRepositoryPassword(),
-						kettleRepositorySpec.getRepositoryUrl() };
-				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
-						TIMEOUT_RESTORE_DB_SECONDS);
-			} else {
-				final String[] command = new String[] { "wget", "-O", targetFile,
-						"--http-user=" + kettleRepositorySpec.getRepositoryUsername(),
-						"--http-password=" + kettleRepositorySpec.getRepositoryPassword(),
-						kettleRepositorySpec.getRepositoryUrl() };
-				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
-						TIMEOUT_RESTORE_DB_SECONDS);
-			}
-		} else {
-			final String[] command = new String[] { "wget", "-O", targetFile, kettleRepositorySpec.getRepositoryUrl() };
-			StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
-					TIMEOUT_RESTORE_DB_SECONDS);
-		}
-		return targetFile;
-	}
-
-	private String downloadDumpDatabaseFromGit(final Deployment deploymentDatabase,
-			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException {
-		@SuppressWarnings("unused")
-		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private String downloadDumpDatabaseFromS3(final Deployment deploymentDatabase,
-			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException {
-		@SuppressWarnings("unused")
-		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -175,6 +62,91 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		}
 	}
 
+	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase)
+			throws InterruptedException, IOException {
+		final String target = "/tmp/" + UUID.randomUUID().toString();
+		final String[] command = new String[] { "mkdir", "-p", target };
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, 15, null);
+		return target;
+	}
+
+	private void databaseManagement(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
+			final Service serviceDatabase) {
+		try {
+			String dumpPath = null;
+			final String repositoryUrl = kettleRepository.getSpec().getRepositoryUrl();
+			if (repositoryUrl.startsWith(StaticUtils.HTTP) || repositoryUrl.startsWith(StaticUtils.HTTPS)
+					|| repositoryUrl.startsWith(StaticUtils.FTP)) {
+				logger.severe(repositoryUrl + " is managed by wget");
+				dumpPath = downloadDumpDatabaseFromFtpHttpOrHttps(deploymentDatabase, kettleRepository.getSpec());
+			} else if (repositoryUrl.startsWith(StaticUtils.GIT_HTTP) || repositoryUrl.startsWith(StaticUtils.GIT_HTTPS)
+					|| repositoryUrl.startsWith(StaticUtils.GIT_SSH)) {
+				logger.severe(repositoryUrl + " is managed by git");
+				dumpPath = downloadDumpDatabaseFromGit(deploymentDatabase, kettleRepository.getSpec());
+			} else if (repositoryUrl.startsWith(StaticUtils.S3)) {
+				logger.severe(repositoryUrl + " is managed by s3 client");
+				dumpPath = downloadDumpDatabaseFromS3(deploymentDatabase, kettleRepository.getSpec());
+			} else if (repositoryUrl.startsWith(StaticUtils.FILE)) {
+				logger.severe(repositoryUrl + " could not to be downloaded");
+				dumpPath = repositoryUrl.substring(StaticUtils.FILE.length());
+			} else {
+				dumpPath = null;
+				logger.severe(repositoryUrl + " not recognized");
+			}
+			if (dumpPath != null) {
+				restoreDatabase(kettleRepository, deploymentDatabase, dumpPath);
+			}
+			setStatusSynchronized(kettleRepository);
+		} catch (final Exception e) {
+			logger.severe("Exception in database management " + LogUtils.stackTraceToString(e));
+		}
+	}
+
+	private String downloadDumpDatabaseFromFtpHttpOrHttps(final Deployment deploymentDatabase,
+			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException, IOException {
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		final String targetFile = targetDirectory + "/repository.sql";
+		if (kettleRepositorySpec.getRepositoryUsername() != null
+				&& kettleRepositorySpec.getRepositoryPassword() != null) {
+			if (kettleRepositorySpec.getRepositoryUrl().startsWith(StaticUtils.FTP)) {
+				final String[] command = new String[] { "wget", "-O", targetFile,
+						"--ftp-user=" + kettleRepositorySpec.getRepositoryUsername(),
+						"--ftp-password=" + kettleRepositorySpec.getRepositoryPassword(),
+						kettleRepositorySpec.getRepositoryUrl() };
+				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
+						TIMEOUT_RESTORE_DB_SECONDS, null);
+			} else {
+				final String[] command = new String[] { "wget", "-O", targetFile,
+						"--http-user=" + kettleRepositorySpec.getRepositoryUsername(),
+						"--http-password=" + kettleRepositorySpec.getRepositoryPassword(),
+						kettleRepositorySpec.getRepositoryUrl() };
+				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
+						TIMEOUT_RESTORE_DB_SECONDS, null);
+			}
+		} else {
+			final String[] command = new String[] { "wget", "-O", targetFile, kettleRepositorySpec.getRepositoryUrl() };
+			StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
+					TIMEOUT_RESTORE_DB_SECONDS, null);
+		}
+		return targetFile;
+	}
+
+	private String downloadDumpDatabaseFromGit(final Deployment deploymentDatabase,
+			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException, IOException {
+		@SuppressWarnings("unused")
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String downloadDumpDatabaseFromS3(final Deployment deploymentDatabase,
+			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException, IOException {
+		@SuppressWarnings("unused")
+		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
 			final String dumpPath) throws InterruptedException, IOException {
 		final String script = "#!/bin/bash\ncat " + dumpPath + " | PGPASSWORD="
@@ -183,15 +155,13 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
 		final String[] commandChmod = new String[] { "chmod", "+x", TMP_LOAD_DB_SCRIPT_PATH };
 		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, commandChmod,
-				TIMEOUT_RESTORE_DB_SECONDS);
+				TIMEOUT_RESTORE_DB_SECONDS, null);
 		final String[] command = new String[] { TMP_LOAD_DB_SCRIPT_PATH };
-		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS);
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS,
+				PATH_CHECK_LOAD_DATABASE);
 	}
 
-	private void setStatusSynchronized(final KettleRepository kettleRepository, final Deployment deploymentDatabase)
-			throws InterruptedException, IOException {
-		final String payload = new Date().toString();
-		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, payload, SYNCHRONIZED_PATH);
+	private void setStatusSynchronized(final KettleRepository kettleRepository) {
 		kettleRepository.getStatus().setReturnCode(KettleRepositoryReconciler.RepositoryStatus.SYNCHRONIZED.toString());
 	}
 
