@@ -41,6 +41,7 @@ public class ServiceIdeResource extends CRUKubernetesDependentResource<Service, 
 			final ServicePort port = new ServicePort();
 			port.setPort(80);
 			spec.setPorts(Arrays.asList(new ServicePort[] { port }));
+			spec.setSelector(labels);
 			service.setSpec(spec);
 			logger.info("actual service " + service);
 		} catch (final Exception e) {
