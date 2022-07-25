@@ -5,7 +5,7 @@ metadata:
   namespace: test-namespace
 spec:
   #image: image-value
-  repositoryUrl: https://www.rossonet.net/dati/pdi/repository/repository.sql
+  repositoryUrl: https://www.rossonet.net/dati/pdi/repository/kettle.sql.gz
   username: rossonet
   password: password1
   databaseName: kettle

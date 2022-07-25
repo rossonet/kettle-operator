@@ -84,7 +84,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	private String downloadDumpDatabaseFromFtpHttpOrHttps(final Deployment deploymentDatabase,
 			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException, IOException {
 		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
-		final String targetFile = targetDirectory + "/repository.sql";
+		final String targetFile = targetDirectory + "/repository.sql.gz";
 		if (kettleRepositorySpec.getRepositoryUsername() != null
 				&& kettleRepositorySpec.getRepositoryPassword() != null) {
 			if (kettleRepositorySpec.getRepositoryUrl().startsWith(StaticUtils.FTP)) {
@@ -150,7 +150,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
 			final String dumpPath) throws InterruptedException, IOException {
-		final String script = "#!/bin/bash\ncat " + dumpPath + " | PGPASSWORD="
+		final String script = "#!/bin/bash\nzcat " + dumpPath + " | PGPASSWORD="
 				+ kettleRepository.getSpec().getPassword() + " psql -h localhost -U "
 				+ kettleRepository.getSpec().getUsername() + " " + kettleRepository.getSpec().getDatabaseName() + "\n";
 		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
