@@ -27,7 +27,8 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	private static final Logger logger = Logger.getLogger(KettleRepositoryReconciler.class.getName());
 
-	private static final String PATH_CHECK_LOAD_DATABASE = "/load_database";
+	private static final String PATH_CHECK_DOWNLOAD_DATABASE = "/download_database";
+	private static final String PATH_CHECK_LOAD_DATABASE = "/restore_database";
 	private static final long TIMEOUT_RESTORE_DB_SECONDS = 5 * 60;
 	private static final String TMP_LOAD_DB_SCRIPT_PATH = "/tmp/load_db.sh";
 	private final KubernetesClient kubernetesClient;
@@ -38,28 +39,6 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 
 	public KettleRepositoryReconciler(final KubernetesClient kubernetesClient) {
 		this.kubernetesClient = kubernetesClient;
-	}
-
-	@Override
-	public UpdateControl<KettleRepository> reconcile(final KettleRepository resource,
-			final Context<KettleRepository> context) {
-		try {
-			logger.fine("reconciler  " + resource + " -> " + context);
-			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
-			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
-			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
-			if (deploymentDatabase != null && deploymentDatabase.getStatus() != null
-					&& deploymentDatabase.getStatus().getReadyReplicas() != null
-					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
-				databaseManagement(resource, deploymentDatabase, serviceDatabase);
-			} else {
-				logger.info("reconciler  waiting all kubernetes resources");
-			}
-			return UpdateControl.patchStatus(resource);
-		} catch (final Exception ee) {
-			logger.severe(LogUtils.stackTraceToString(ee));
-			throw ee;
-		}
 	}
 
 	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase)
@@ -114,19 +93,19 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 						"--ftp-password=" + kettleRepositorySpec.getRepositoryPassword(),
 						kettleRepositorySpec.getRepositoryUrl() };
 				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
-						TIMEOUT_RESTORE_DB_SECONDS, null);
+						TIMEOUT_RESTORE_DB_SECONDS, PATH_CHECK_DOWNLOAD_DATABASE);
 			} else {
 				final String[] command = new String[] { "wget", "-O", targetFile,
 						"--http-user=" + kettleRepositorySpec.getRepositoryUsername(),
 						"--http-password=" + kettleRepositorySpec.getRepositoryPassword(),
 						kettleRepositorySpec.getRepositoryUrl() };
 				StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
-						TIMEOUT_RESTORE_DB_SECONDS, null);
+						TIMEOUT_RESTORE_DB_SECONDS, PATH_CHECK_DOWNLOAD_DATABASE);
 			}
 		} else {
 			final String[] command = new String[] { "wget", "-O", targetFile, kettleRepositorySpec.getRepositoryUrl() };
 			StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command,
-					TIMEOUT_RESTORE_DB_SECONDS, null);
+					TIMEOUT_RESTORE_DB_SECONDS, PATH_CHECK_DOWNLOAD_DATABASE);
 		}
 		return targetFile;
 	}
@@ -147,16 +126,35 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		return null;
 	}
 
+	@Override
+	public UpdateControl<KettleRepository> reconcile(final KettleRepository resource,
+			final Context<KettleRepository> context) {
+		try {
+			logger.fine("reconciler  " + resource + " -> " + context);
+			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
+			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
+			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
+			if (deploymentDatabase != null && deploymentDatabase.getStatus() != null
+					&& deploymentDatabase.getStatus().getReadyReplicas() != null
+					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
+				databaseManagement(resource, deploymentDatabase, serviceDatabase);
+			} else {
+				logger.info("reconciler  waiting all kubernetes resources");
+			}
+			return UpdateControl.patchStatus(resource);
+		} catch (final Exception ee) {
+			logger.severe(LogUtils.stackTraceToString(ee));
+			throw ee;
+		}
+	}
+
 	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
 			final String dumpPath) throws InterruptedException, IOException {
 		final String script = "#!/bin/bash\ncat " + dumpPath + " | PGPASSWORD="
 				+ kettleRepository.getSpec().getPassword() + " psql -h localhost -U "
 				+ kettleRepository.getSpec().getUsername() + " " + kettleRepository.getSpec().getDatabaseName() + "\n";
 		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
-		final String[] commandChmod = new String[] { "chmod", "+x", TMP_LOAD_DB_SCRIPT_PATH };
-		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, commandChmod,
-				TIMEOUT_RESTORE_DB_SECONDS, null);
-		final String[] command = new String[] { TMP_LOAD_DB_SCRIPT_PATH };
+		final String[] command = new String[] { "bash", TMP_LOAD_DB_SCRIPT_PATH };
 		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS,
 				PATH_CHECK_LOAD_DATABASE);
 	}
