@@ -42,7 +42,7 @@ dependencies {
   annotationProcessor "io.javaoperatorsdk:operator-framework:3.0.3"
   annotationProcessor 'io.fabric8:crd-generator-apt:5.12.2'
   implementation 'org.apache.commons:commons-compress:1.21' // per passaggio file tramite API k8s
-  implementation 'org.takes:takes:1.20'
+  implementation 'org.takes:takes:1.21.1'
   implementation 'org.slf4j:slf4j-jdk14:1.7.36'
   implementation 'javax.validation:validation-api:2.0.1.Final'
   // testing
