@@ -41,6 +41,28 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		this.kubernetesClient = kubernetesClient;
 	}
 
+	@Override
+	public UpdateControl<KettleRepository> reconcile(final KettleRepository resource,
+			final Context<KettleRepository> context) {
+		try {
+			logger.fine("reconciler  " + resource + " -> " + context);
+			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
+			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
+			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
+			if (deploymentDatabase != null && deploymentDatabase.getStatus() != null
+					&& deploymentDatabase.getStatus().getReadyReplicas() != null
+					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
+				databaseManagement(resource, deploymentDatabase, serviceDatabase);
+			} else {
+				logger.info("reconciler  waiting all kubernetes resources");
+			}
+			return UpdateControl.patchStatus(resource);
+		} catch (final Exception ee) {
+			logger.severe(LogUtils.stackTraceToString(ee));
+			throw ee;
+		}
+	}
+
 	private String createTemporaryRepositoryDirectory(final Deployment deploymentDatabase)
 			throws InterruptedException, IOException {
 		final String target = "/tmp/" + UUID.randomUUID().toString();
@@ -84,7 +106,12 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 	private String downloadDumpDatabaseFromFtpHttpOrHttps(final Deployment deploymentDatabase,
 			final KettleRepositorySpec kettleRepositorySpec) throws InterruptedException, IOException {
 		final String targetDirectory = createTemporaryRepositoryDirectory(deploymentDatabase);
-		final String targetFile = targetDirectory + "/repository.sql.gz";
+		String targetFile = targetDirectory + "/repository";
+		if (kettleRepositorySpec.getRepositoryUrl().endsWith(".sql.gz")) {
+			targetFile = targetDirectory + "/repository.sql.gz";
+		} else if (kettleRepositorySpec.getRepositoryUrl().endsWith(".sql")) {
+			targetFile = targetDirectory + "/repository.sql";
+		}
 		if (kettleRepositorySpec.getRepositoryUsername() != null
 				&& kettleRepositorySpec.getRepositoryPassword() != null) {
 			if (kettleRepositorySpec.getRepositoryUrl().startsWith(StaticUtils.FTP)) {
@@ -126,34 +153,19 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 		return null;
 	}
 
-	@Override
-	public UpdateControl<KettleRepository> reconcile(final KettleRepository resource,
-			final Context<KettleRepository> context) {
-		try {
-			logger.fine("reconciler  " + resource + " -> " + context);
-			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
-			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
-			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase.getMetadata().getName()));
-			if (deploymentDatabase != null && deploymentDatabase.getStatus() != null
-					&& deploymentDatabase.getStatus().getReadyReplicas() != null
-					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
-				databaseManagement(resource, deploymentDatabase, serviceDatabase);
-			} else {
-				logger.info("reconciler  waiting all kubernetes resources");
-			}
-			return UpdateControl.patchStatus(resource);
-		} catch (final Exception ee) {
-			logger.severe(LogUtils.stackTraceToString(ee));
-			throw ee;
-		}
-	}
-
 	private void restoreDatabase(final KettleRepository kettleRepository, final Deployment deploymentDatabase,
 			final String dumpPath) throws InterruptedException, IOException {
-		final String script = "#!/bin/bash\nzcat " + dumpPath + " | PGPASSWORD="
-				+ kettleRepository.getSpec().getPassword() + " psql -h localhost -U "
-				+ kettleRepository.getSpec().getUsername() + " " + kettleRepository.getSpec().getDatabaseName() + "\n";
-		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script, TMP_LOAD_DB_SCRIPT_PATH);
+		final StringBuilder script = new StringBuilder();
+		script.append("#!/bin/bash\n");
+		if (dumpPath.endsWith("sql.gz")) {
+			script.append("zcat \" + dumpPath");
+		} else {
+			script.append("cat \" + dumpPath");
+		}
+		script.append(" | PGPASSWORD=" + kettleRepository.getSpec().getPassword() + " psql -h localhost -U "
+				+ kettleRepository.getSpec().getUsername() + " " + kettleRepository.getSpec().getDatabaseName() + "\n");
+		StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentDatabase, script.toString(),
+				TMP_LOAD_DB_SCRIPT_PATH);
 		final String[] command = new String[] { "bash", TMP_LOAD_DB_SCRIPT_PATH };
 		StaticUtils.execCommandOnDeployment(kubernetesClient, deploymentDatabase, command, TIMEOUT_RESTORE_DB_SECONDS,
 				PATH_CHECK_LOAD_DATABASE);
