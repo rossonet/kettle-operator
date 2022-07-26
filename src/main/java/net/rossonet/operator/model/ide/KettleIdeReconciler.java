@@ -38,30 +38,6 @@ public class KettleIdeReconciler implements Reconciler<KettleIde> {
 		this.kubernetesClient = kubernetesClient;
 	}
 
-	@Override
-	public UpdateControl<KettleIde> reconcile(final KettleIde resource, final Context<KettleIde> context)
-			throws Exception {
-		try {
-			logger.fine("reconciler  " + resource + " -> " + context);
-			final Deployment deploymentIde = context.getSecondaryResource(Deployment.class).get();
-			final Service serviceIde = context.getSecondaryResource(Service.class).get();
-			resource.setStatus(StaticUtils.createKettleIdeStatus(deploymentIde.getMetadata().getName()));
-			if (deploymentIde != null && deploymentIde.getStatus() != null
-					&& deploymentIde.getStatus().getReadyReplicas() != null
-					&& deploymentIde.getStatus().getReadyReplicas() > 0 && serviceIde != null) {
-				final String xmlRepositories = repositoriesManagement(resource, deploymentIde, serviceIde);
-				StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentIde, xmlRepositories,
-						"/root/.kettle/repositories");
-			} else {
-				logger.info("reconciler  waiting all kubernetes resources");
-			}
-			return UpdateControl.patchStatus(resource);
-		} catch (final Exception ee) {
-			logger.severe(LogUtils.stackTraceToString(ee));
-			throw ee;
-		}
-	}
-
 	private void addConnection(final StringBuilder sb, final KettleRepository kettleRepository) {
 		sb.append("  <connection>\n");
 		sb.append("    <name>" + kettleRepository.getMetadata().getName() + "</name>\n");
@@ -107,6 +83,30 @@ public class KettleIdeReconciler implements Reconciler<KettleIde> {
 		final String target = "/root/.kettle";
 		final String[] command = new String[] { "mkdir", "-p", target };
 		StaticUtils.execCommandOnDeployment(kubernetesClient, deployment, command, 15, null);
+	}
+
+	@Override
+	public UpdateControl<KettleIde> reconcile(final KettleIde resource, final Context<KettleIde> context)
+			throws Exception {
+		try {
+			logger.fine("reconciler  " + resource + " -> " + context);
+			final Deployment deploymentIde = context.getSecondaryResource(Deployment.class).get();
+			final Service serviceIde = context.getSecondaryResource(Service.class).get();
+			resource.setStatus(StaticUtils.createKettleIdeStatus(deploymentIde.getMetadata().getName()));
+			if (deploymentIde != null && deploymentIde.getStatus() != null
+					&& deploymentIde.getStatus().getReadyReplicas() != null
+					&& deploymentIde.getStatus().getReadyReplicas() > 0 && serviceIde != null) {
+				final String xmlRepositories = repositoriesManagement(resource, deploymentIde, serviceIde);
+				StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentIde, xmlRepositories,
+						"/root/.kettle/repositories.xml");
+			} else {
+				logger.info("reconciler  waiting all kubernetes resources");
+			}
+			return UpdateControl.patchStatus(resource);
+		} catch (final Exception ee) {
+			logger.severe(LogUtils.stackTraceToString(ee));
+			throw ee;
+		}
 	}
 
 	private String repositoriesManagement(final KettleIde kettleIde, final Deployment deploymentIde,
