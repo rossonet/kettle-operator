@@ -3,7 +3,7 @@ name: Build and publish docker images of runner components to GitHub Registry
 on:
   push:
     branches:
-    - main
+    - runners
 
 jobs:
   build:
