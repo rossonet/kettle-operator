@@ -14,16 +14,22 @@ import java.util.logging.Logger;
 
 import com.google.common.io.Files;
 
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import net.rossonet.operator.model.cron.job.CronKettleJob;
 import net.rossonet.operator.model.cron.job.CronKettleJobStatus;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformation;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformationStatus;
+import net.rossonet.operator.model.ide.KettleIde;
 import net.rossonet.operator.model.ide.KettleIdeStatus;
+import net.rossonet.operator.model.repository.KettleRepository;
 import net.rossonet.operator.model.repository.KettleRepositoryStatus;
 import net.rossonet.operator.model.simple.job.KettleJob;
 import net.rossonet.operator.model.simple.job.KettleJobStatus;
@@ -31,6 +37,42 @@ import net.rossonet.operator.model.simple.transformation.KettleTransformation;
 import net.rossonet.operator.model.simple.transformation.KettleTransformationStatus;
 
 public class StaticUtils {
+
+	private static class ExecPodListener implements ExecListener {
+		private final CountDownLatch execLatch;
+
+		public ExecPodListener(final CountDownLatch execLatch) {
+			this.execLatch = execLatch;
+		}
+
+		public CountDownLatch getExecLatch() {
+			return execLatch;
+		}
+
+		@Override
+		public void onClose(final int i, final String s) {
+			logger.info("Shell Closing with return code " + i);
+			logger.info(s);
+			execLatch.countDown();
+		}
+
+		@Override
+		public void onFailure(final Throwable t, final Response failureResponse) {
+			logger.warning("Some error encountered");
+			logger.warning(LogUtils.stackTraceToString(t));
+			try {
+				logger.warning(failureResponse.body());
+			} catch (final IOException e) {
+				logger.warning(LogUtils.stackTraceToString(e));
+			}
+			execLatch.countDown();
+		}
+
+		@Override
+		public void onOpen() {
+			logger.info("Shell was opened");
+		}
+	}
 
 	public static class ExecResult {
 
@@ -92,50 +134,18 @@ public class StaticUtils {
 
 	}
 
-	private static class ExecPodListener implements ExecListener {
-		private final CountDownLatch execLatch;
-
-		public ExecPodListener(final CountDownLatch execLatch) {
-			this.execLatch = execLatch;
-		}
-
-		public CountDownLatch getExecLatch() {
-			return execLatch;
-		}
-
-		@Override
-		public void onClose(final int i, final String s) {
-			logger.info("Shell Closing with return code " + i);
-			logger.info(s);
-			execLatch.countDown();
-		}
-
-		@Override
-		public void onFailure(final Throwable t, final Response failureResponse) {
-			logger.warning("Some error encountered");
-			logger.warning(LogUtils.stackTraceToString(t));
-			try {
-				logger.warning(failureResponse.body());
-			} catch (final IOException e) {
-				logger.warning(LogUtils.stackTraceToString(e));
-			}
-			execLatch.countDown();
-		}
-
-		@Override
-		public void onOpen() {
-			logger.info("Shell was opened");
-		}
-	}
-
 	public static final String DATA_MANAGED_BY = "kettle-operator";
 	public static final String FILE = "file://";
 
+	private static String footerRepositories = "</repositories>\n";
 	public static final String FTP = "ftp://";
 	public static final String GIT_HTTP = "git-http://";
+
 	public static final String GIT_HTTPS = "git-https://";
 
 	public static final String GIT_SSH = "git-ssh://";
+
+	private static String headerRepositories = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<repositories>\n";
 
 	public static final String HTTP = "http://";
 
@@ -147,15 +157,71 @@ public class StaticUtils {
 
 	public static final String LABEL_PART_OF = "app.kubernetes.io/part-of";
 
+	private static final Logger logger = Logger.getLogger(StaticUtils.class.getName());
+
 	public static final String S3 = "s3://";
 
 	public static final String SELECTOR = LABEL_MANAGED_BY + "=" + DATA_MANAGED_BY;
 
-	private static final Logger logger = Logger.getLogger(StaticUtils.class.getName());
-
 	private static final String SYNCHRONIZED_FILE_MARK = "SYNCHRONIZED FILE FOUND";
 
 	private static final long TIMEOUT_CHECK_SECONDS = 60;
+
+	private static void addConnection(final StringBuilder sb, final KettleRepository kettleRepository) {
+		sb.append("  <connection>\n");
+		sb.append("    <name>" + kettleRepository.getMetadata().getName() + "</name>\n");
+		sb.append("    <server>" + kettleRepository.getMetadata().getName() + "</server>\n");
+		sb.append("    <type>POSTGRESQL</type>\n");
+		sb.append("    <access>Native</access>\n");
+		sb.append("    <database>" + kettleRepository.getSpec().getDatabaseName() + "</database>\n");
+		sb.append("    <port>5432</port>\n");
+		sb.append("    <username>" + kettleRepository.getSpec().getUsername() + "</username>\n");
+		sb.append("    <password>" + kettleRepository.getSpec().getPassword() + "</password>\n");
+		sb.append("    <servername/>\n");
+		sb.append("    <data_tablespace/>\n");
+		sb.append("    <index_tablespace/>\n");
+		sb.append("    <attributes>\n");
+		sb.append("      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>\n");
+		sb.append("      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>\n");
+		sb.append("      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>\n");
+		sb.append("      <attribute><code>PORT_NUMBER</code><attribute>5432</attribute></attribute>\n");
+		sb.append("      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute>\n");
+		sb.append("      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>\n");
+		sb.append("      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>\n");
+		sb.append("      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>\n");
+		sb.append("      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>\n");
+		sb.append("    </attributes>\n");
+		sb.append("  </connection>");
+	}
+
+	private static void addRepository(final StringBuilder sb, final KettleRepository kettleRepository) {
+		sb.append(" <repository>\n");
+		sb.append("    <id>KettleDatabaseRepository</id>\n");
+		sb.append("    <name>Repository " + kettleRepository.getMetadata().getName() + "</name>\n");
+		sb.append("    <description>" + "KubernetesRepository configuration:\n" + kettleRepository.getSpec().toString()
+				+ "</description>\n");
+		sb.append("    <is_default>false</is_default>\n");
+		sb.append("    <connection>" + kettleRepository.getMetadata().getName() + "</connection>\n");
+		sb.append("  </repository>");
+
+	}
+
+	private static boolean checkControlFile(final KubernetesClient kubernetesClient, final String namespace,
+			final String podName, final String onlyOneTimePath) throws IOException, InterruptedException {
+		final String destinationFile = onlyOneTimePath + "_script.sh";
+		final String script = "if [ -f " + createCheckFile(onlyOneTimePath) + " ]\nthen\necho '"
+				+ SYNCHRONIZED_FILE_MARK + "'\nelse\necho 'KO'\nfi\n";
+		final File tempFile = createLocalTempFile(script);
+		saveFileOnPod(kubernetesClient, destinationFile, namespace, tempFile, podName);
+		final String[] command = new String[] { "bash", destinationFile };
+		final ExecResult result = execOnPod(kubernetesClient, namespace, podName, command, TIMEOUT_CHECK_SECONDS);
+		return result.getStandardOutput().contains(SYNCHRONIZED_FILE_MARK);
+	}
+
+	private static String createCheckFile(final String onlyOneTimePath) {
+		final String checkFile = onlyOneTimePath + "_check";
+		return checkFile;
+	}
 
 	public static List<String> createCronJobCommand(final CronKettleJob kettleJob) {
 		// TODO implementare logica
@@ -182,6 +248,13 @@ public class StaticUtils {
 		return Arrays.asList(new String[] { "uname -a" });
 	}
 
+	public static void createKettleConfigurationDirectory(final KubernetesClient kubernetesClient,
+			final Deployment deployment) throws InterruptedException, IOException {
+		final String target = "/root/.kettle";
+		final String[] command = new String[] { "mkdir", "-p", target };
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deployment, command, 15, null);
+	}
+
 	public static KettleIdeStatus createKettleIdeStatus(final String name) {
 		// TODO implementare logica
 		return new KettleIdeStatus();
@@ -200,6 +273,13 @@ public class StaticUtils {
 	public static KettleTransformationStatus createKettleTransformationStatus(final String name) {
 		// TODO implementare logica
 		return new KettleTransformationStatus();
+	}
+
+	private static File createLocalTempFile(final String payload) throws IOException {
+		final File tempFile = new File("/tmp/" + UUID.randomUUID().toString());
+		Files.write(payload.getBytes(), tempFile);
+		tempFile.deleteOnExit();
+		return tempFile;
 	}
 
 	public static List<String> createTransformationCommand(final KettleTransformation kettleTransformation) {
@@ -226,42 +306,6 @@ public class StaticUtils {
 			}
 		}
 		return result;
-	}
-
-	public static void saveStringToFileOnDeployment(final KubernetesClient kubernetesClient,
-			final Deployment deployment, final String payload, final String destinationFile) throws IOException {
-		final String namespace = deployment.getMetadata().getNamespace();
-		final String podName = deployment.getMetadata().getName();
-		final File tempFile = createLocalTempFile(payload);
-		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
-				.list().getItems()) {
-			saveFileOnPod(kubernetesClient, destinationFile, namespace, tempFile, pod.getMetadata().getName());
-		}
-		tempFile.delete();
-	}
-
-	private static boolean checkControlFile(final KubernetesClient kubernetesClient, final String namespace,
-			final String podName, final String onlyOneTimePath) throws IOException, InterruptedException {
-		final String destinationFile = onlyOneTimePath + "_script.sh";
-		final String script = "if [ -f " + createCheckFile(onlyOneTimePath) + " ]\nthen\necho '"
-				+ SYNCHRONIZED_FILE_MARK + "'\nelse\necho 'KO'\nfi\n";
-		final File tempFile = createLocalTempFile(script);
-		saveFileOnPod(kubernetesClient, destinationFile, namespace, tempFile, podName);
-		final String[] command = new String[] { "bash", destinationFile };
-		final ExecResult result = execOnPod(kubernetesClient, namespace, podName, command, TIMEOUT_CHECK_SECONDS);
-		return result.getStandardOutput().contains(SYNCHRONIZED_FILE_MARK);
-	}
-
-	private static String createCheckFile(final String onlyOneTimePath) {
-		final String checkFile = onlyOneTimePath + "_check";
-		return checkFile;
-	}
-
-	private static File createLocalTempFile(final String payload) throws IOException {
-		final File tempFile = new File("/tmp/" + UUID.randomUUID().toString());
-		Files.write(payload.getBytes(), tempFile);
-		tempFile.deleteOnExit();
-		return tempFile;
 	}
 
 	private static ExecResult execOnPod(final KubernetesClient kubernetesClient, final String namespace,
@@ -291,11 +335,38 @@ public class StaticUtils {
 		return new ExecResult(command, output, error);
 	}
 
+	public static String repositoriesManagement(final KubernetesClient kubernetesClient, final KettleIde kettleIde,
+			final Deployment deploymentIde, final Service serviceIde) throws InterruptedException, IOException {
+		final MixedOperation<KettleRepository, KubernetesResourceList<KettleRepository>, Resource<KettleRepository>> repositoryClient = kubernetesClient
+				.resources(KettleRepository.class);
+		final StringBuilder sb = new StringBuilder();
+		sb.append(headerRepositories);
+		for (final KettleRepository kettleRepository : repositoryClient
+				.inNamespace(kettleIde.getMetadata().getNamespace()).list().getItems()) {
+			addConnection(sb, kettleRepository);
+			addRepository(sb, kettleRepository);
+		}
+		sb.append(footerRepositories);
+		return sb.toString();
+	}
+
 	private static void saveFileOnPod(final KubernetesClient kubernetesClient, final String destinationFile,
 			final String namespace, final File tempFile, final String podNameSelected) {
 		logger.fine("pod " + podNameSelected + " in namespace " + namespace);
 		kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected).file(destinationFile)
 				.upload(tempFile.toPath());
+	}
+
+	public static void saveStringToFileOnDeployment(final KubernetesClient kubernetesClient,
+			final Deployment deployment, final String payload, final String destinationFile) throws IOException {
+		final String namespace = deployment.getMetadata().getNamespace();
+		final String podName = deployment.getMetadata().getName();
+		final File tempFile = createLocalTempFile(payload);
+		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
+				.list().getItems()) {
+			saveFileOnPod(kubernetesClient, destinationFile, namespace, tempFile, pod.getMetadata().getName());
+		}
+		tempFile.delete();
 	}
 
 	private StaticUtils() {
