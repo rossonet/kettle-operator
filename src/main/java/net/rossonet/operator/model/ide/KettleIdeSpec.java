@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
-import net.rossonet.operator.model.simple.KettleWork;
+import net.rossonet.operator.model.KettleWork;
 
 public class KettleIdeSpec {
 

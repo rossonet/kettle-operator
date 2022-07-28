@@ -88,6 +88,8 @@ public class KettleOperator {
 
 	private static final Logger logger = Logger.getLogger(KettleOperator.class.getName());
 
+	private static KubernetesClient usedClient = null;
+
 	public static void changeLogLevel(final String logLevel) throws ConfigurationException {
 		final Logger rootLogger = Logger.getLogger("");
 		Level targetLevel = Level.INFO;
@@ -129,6 +131,10 @@ public class KettleOperator {
 		}
 	}
 
+	public static KubernetesClient getUsedClient() {
+		return usedClient;
+	}
+
 	public static void main(final String[] args) throws IOException {
 		logger.info("operator init");
 		try {
@@ -138,6 +144,7 @@ public class KettleOperator {
 		}
 		final Config config = new ConfigBuilder().withNamespace(null).build();
 		final KubernetesClient client = new DefaultKubernetesClient(config);
+		setUsedClient(client);
 		final Operator operator = new Operator(client);
 		operator.register(new KettleJobReconciler(client));
 		operator.register(new KettleTransformationReconciler(client));
@@ -150,6 +157,10 @@ public class KettleOperator {
 		logger.info("operator started");
 		new FtBasic(new TkFork(new FkRegex("/health", "ALL GOOD.")), 8080).start(Exit.NEVER);
 		client.close();
+	}
+
+	public static void setUsedClient(final KubernetesClient usedClient) {
+		KettleOperator.usedClient = usedClient;
 	}
 
 	@SuppressWarnings("unused")

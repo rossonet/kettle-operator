@@ -14,9 +14,9 @@ import java.util.logging.Logger;
 
 import com.google.common.io.Files;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
@@ -27,7 +27,6 @@ import net.rossonet.operator.model.cron.job.CronKettleJob;
 import net.rossonet.operator.model.cron.job.CronKettleJobStatus;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformation;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformationStatus;
-import net.rossonet.operator.model.ide.KettleIde;
 import net.rossonet.operator.model.ide.KettleIdeStatus;
 import net.rossonet.operator.model.repository.KettleRepository;
 import net.rossonet.operator.model.repository.KettleRepositoryStatus;
@@ -135,12 +134,12 @@ public class StaticUtils {
 	}
 
 	public static final String DATA_MANAGED_BY = "kettle-operator";
-	public static final String FILE = "file://";
 
+	public static final String FILE = "file://";
 	private static String footerRepositories = "</repositories>\n";
+
 	public static final String FTP = "ftp://";
 	public static final String GIT_HTTP = "git-http://";
-
 	public static final String GIT_HTTPS = "git-https://";
 
 	public static final String GIT_SSH = "git-ssh://";
@@ -158,6 +157,8 @@ public class StaticUtils {
 	public static final String LABEL_PART_OF = "app.kubernetes.io/part-of";
 
 	private static final Logger logger = Logger.getLogger(StaticUtils.class.getName());
+
+	public static final String REPOSITORIES = "repositories";
 
 	public static final String S3 = "s3://";
 
@@ -284,7 +285,7 @@ public class StaticUtils {
 
 	public static List<String> createTransformationCommand(final KettleTransformation kettleTransformation) {
 		// TODO implementare logica
-		return Arrays.asList(new String[] { "uname -a" });
+		return Arrays.asList(new String[] { "sleep 80000" });
 	}
 
 	public static List<ExecResult> execCommandOnDeployment(final KubernetesClient kubernetesClient,
@@ -335,14 +336,14 @@ public class StaticUtils {
 		return new ExecResult(command, output, error);
 	}
 
-	public static String repositoriesManagement(final KubernetesClient kubernetesClient, final KettleIde kettleIde,
-			final Deployment deploymentIde, final Service serviceIde) throws InterruptedException, IOException {
+	public static String repositoriesManagement(final KubernetesClient kubernetesClient, final HasMetadata resource)
+			throws InterruptedException, IOException {
 		final MixedOperation<KettleRepository, KubernetesResourceList<KettleRepository>, Resource<KettleRepository>> repositoryClient = kubernetesClient
 				.resources(KettleRepository.class);
 		final StringBuilder sb = new StringBuilder();
 		sb.append(headerRepositories);
 		for (final KettleRepository kettleRepository : repositoryClient
-				.inNamespace(kettleIde.getMetadata().getNamespace()).list().getItems()) {
+				.inNamespace(resource.getMetadata().getNamespace()).list().getItems()) {
 			addConnection(sb, kettleRepository);
 			addRepository(sb, kettleRepository);
 		}

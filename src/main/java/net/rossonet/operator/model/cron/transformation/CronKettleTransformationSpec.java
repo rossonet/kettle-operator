@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
-import net.rossonet.operator.model.simple.KettleWork;
+import net.rossonet.operator.model.KettleWork;
 
 public class CronKettleTransformationSpec {
 

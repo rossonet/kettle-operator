@@ -2,6 +2,7 @@ package net.rossonet.operator.model.simple.transformation;
 
 import java.util.logging.Logger;
 
+import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -14,7 +15,8 @@ import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
-@ControllerConfiguration(dependents = { @Dependent(type = SimpleTransformationResource.class) })
+@ControllerConfiguration(dependents = { @Dependent(type = SimpleTransformationResource.class),
+		@Dependent(type = RepositoriesConfigMapResource.class) })
 public class KettleTransformationReconciler implements Reconciler<KettleTransformation> {
 	private static final Logger logger = Logger.getLogger(KettleTransformationReconciler.class.getName());
 
@@ -34,8 +36,10 @@ public class KettleTransformationReconciler implements Reconciler<KettleTransfor
 			final Context<KettleTransformation> context) {
 		try {
 			logger.info("reconciler  " + resource + " -> " + context);
-			final String name = context.getSecondaryResource(Job.class).get().getMetadata().getName();
-			resource.setStatus(StaticUtils.createKettleTransformationStatus(name));
+			final ConfigMap configMap = context.getSecondaryResource(ConfigMap.class).get();
+			logger.fine("repository.xml in config map  " + configMap.getData().get(StaticUtils.REPOSITORIES));
+			final Job job = context.getSecondaryResource(Job.class).get();
+			resource.setStatus(StaticUtils.createKettleTransformationStatus(job.getMetadata().getName()));
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));

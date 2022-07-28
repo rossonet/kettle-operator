@@ -1,4 +1,4 @@
-package net.rossonet.operator.model.simple;
+package net.rossonet.operator.model;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 

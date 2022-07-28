@@ -2,8 +2,8 @@ package net.rossonet.operator.model.repository;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
+import net.rossonet.operator.model.KettleWork;
 import net.rossonet.operator.model.StaticUtils;
-import net.rossonet.operator.model.simple.KettleWork;
 
 public class KettleRepositorySpec {
 
