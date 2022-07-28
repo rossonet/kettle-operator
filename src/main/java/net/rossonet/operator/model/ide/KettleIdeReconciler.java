@@ -37,7 +37,7 @@ public class KettleIdeReconciler implements Reconciler<KettleIde> {
 			logger.fine("reconciler  " + resource + " -> " + context);
 			final Deployment deploymentIde = context.getSecondaryResource(Deployment.class).get();
 			final Service serviceIde = context.getSecondaryResource(Service.class).get();
-			resource.setStatus(StaticUtils.createKettleIdeStatus(deploymentIde.getMetadata().getName()));
+			resource.setStatus(StaticUtils.createKettleIdeStatus(deploymentIde));
 			if (deploymentIde != null && deploymentIde.getStatus() != null
 					&& deploymentIde.getStatus().getReadyReplicas() != null
 					&& deploymentIde.getStatus().getReadyReplicas() > 0 && serviceIde != null) {

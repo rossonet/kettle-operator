@@ -18,6 +18,8 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
@@ -136,12 +138,12 @@ public class StaticUtils {
 	public static final String DATA_MANAGED_BY = "kettle-operator";
 
 	public static final String FILE = "file://";
-	private static String footerRepositories = "</repositories>\n";
 
+	private static String footerRepositories = "</repositories>\n";
 	public static final String FTP = "ftp://";
+
 	public static final String GIT_HTTP = "git-http://";
 	public static final String GIT_HTTPS = "git-https://";
-
 	public static final String GIT_SSH = "git-ssh://";
 
 	private static String headerRepositories = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<repositories>\n";
@@ -159,6 +161,8 @@ public class StaticUtils {
 	private static final Logger logger = Logger.getLogger(StaticUtils.class.getName());
 
 	public static final String REPOSITORIES = "repositories";
+
+	public static final String REPOSITORIES_VOLUME_NAME = "repositories-config";
 
 	public static final String S3 = "s3://";
 
@@ -229,13 +233,13 @@ public class StaticUtils {
 		return Arrays.asList(new String[] { "uname -a" });
 	}
 
-	public static CronKettleJobStatus createCronKettleJobStatus(final String name) {
-		// TODO implementare logica
+	public static CronKettleJobStatus createCronKettleJobStatus(final CronJob job) {
+		// implementare logica
 		return new CronKettleJobStatus();
 	}
 
-	public static CronKettleTransformationStatus createCronKettleTransformationStatus(final String name) {
-		// TODO implementare logica
+	public static CronKettleTransformationStatus createCronKettleTransformationStatus(final CronJob job) {
+		// implementare logica
 		return new CronKettleTransformationStatus();
 	}
 
@@ -256,23 +260,23 @@ public class StaticUtils {
 		StaticUtils.execCommandOnDeployment(kubernetesClient, deployment, command, 15, null);
 	}
 
-	public static KettleIdeStatus createKettleIdeStatus(final String name) {
-		// TODO implementare logica
+	public static KettleIdeStatus createKettleIdeStatus(final Deployment deployment) {
+		// implementare logica
 		return new KettleIdeStatus();
 	}
 
-	public static KettleJobStatus createKettleJobStatus(final String name) {
-		// TODO implementare logica
+	public static KettleJobStatus createKettleJobStatus(final Job job) {
+		// implementare logica
 		return new KettleJobStatus();
 	}
 
-	public static KettleRepositoryStatus createKettleRepositoryStatus(final String name) {
-		// TODO implementare logica
+	public static KettleRepositoryStatus createKettleRepositoryStatus(final Deployment deployment) {
+		// implementare logica
 		return new KettleRepositoryStatus();
 	}
 
-	public static KettleTransformationStatus createKettleTransformationStatus(final String name) {
-		// TODO implementare logica
+	public static KettleTransformationStatus createKettleTransformationStatus(final Job job) {
+		// implementare logica
 		return new KettleTransformationStatus();
 	}
 
@@ -285,7 +289,7 @@ public class StaticUtils {
 
 	public static List<String> createTransformationCommand(final KettleTransformation kettleTransformation) {
 		// TODO implementare logica
-		return Arrays.asList(new String[] { "sleep 80000" });
+		return Arrays.asList(new String[] { "uname -a" });
 	}
 
 	public static List<ExecResult> execCommandOnDeployment(final KubernetesClient kubernetesClient,

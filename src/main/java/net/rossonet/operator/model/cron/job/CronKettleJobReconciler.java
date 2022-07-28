@@ -2,6 +2,7 @@ package net.rossonet.operator.model.cron.job;
 
 import java.util.logging.Logger;
 
+import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -13,8 +14,10 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
+import net.rossonet.operator.model.simple.transformation.RepositoriesConfigMapResource;
 
-@ControllerConfiguration(dependents = { @Dependent(type = SimpleCronJobResource.class) })
+@ControllerConfiguration(dependents = { @Dependent(type = SimpleCronJobResource.class),
+		@Dependent(type = RepositoriesConfigMapResource.class) })
 public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 	private static final Logger logger = Logger.getLogger(CronKettleJobReconciler.class.getName());
 
@@ -33,8 +36,10 @@ public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 	public UpdateControl<CronKettleJob> reconcile(final CronKettleJob resource, final Context<CronKettleJob> context) {
 		try {
 			logger.info("reconciler  " + resource + " -> " + context);
-			final String name = context.getSecondaryResource(CronJob.class).get().getMetadata().getName();
-			resource.setStatus(StaticUtils.createCronKettleJobStatus(name));
+			final CronJob job = context.getSecondaryResource(CronJob.class).get();
+			final ConfigMap configMap = context.getSecondaryResource(ConfigMap.class).get();
+			logger.fine("repository.xml in config map  " + configMap.getData().get(StaticUtils.REPOSITORIES));
+			resource.setStatus(StaticUtils.createCronKettleJobStatus(job));
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));

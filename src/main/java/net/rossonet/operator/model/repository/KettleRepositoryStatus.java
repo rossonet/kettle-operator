@@ -1,22 +1,20 @@
 package net.rossonet.operator.model.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class KettleRepositoryStatus {
 
-	private String errorMessage = null;
+	private List<String> messages = new ArrayList<>();
 
-	private String lastBackupTime = null;
 	private String returnCode = KettleRepositoryReconciler.RepositoryStatus.INIT.toString();
 
 	private int totalJobs = 0;
 
 	private int totalTransformations = 0;
 
-	public String getErrorMessage() {
-		return errorMessage;
-	}
-
-	public String getLastBackupTime() {
-		return lastBackupTime;
+	public List<String> getMessages() {
+		return messages;
 	}
 
 	public String getReturnCode() {
@@ -31,12 +29,8 @@ public class KettleRepositoryStatus {
 		return totalTransformations;
 	}
 
-	public void setErrorMessage(final String errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
-	public void setLastBackupTime(final String lastBackupTime) {
-		this.lastBackupTime = lastBackupTime;
+	public void setMessages(final List<String> messages) {
+		this.messages = messages;
 	}
 
 	public void setReturnCode(final String returnCode) {
@@ -55,14 +49,9 @@ public class KettleRepositoryStatus {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("KettleRepositoryStatus [");
-		if (errorMessage != null) {
-			builder.append("errorMessage=");
-			builder.append(errorMessage);
-			builder.append(", ");
-		}
-		if (lastBackupTime != null) {
-			builder.append("lastBackupTime=");
-			builder.append(lastBackupTime);
+		if (messages != null) {
+			builder.append("messages=");
+			builder.append(messages);
 			builder.append(", ");
 		}
 		if (returnCode != null) {

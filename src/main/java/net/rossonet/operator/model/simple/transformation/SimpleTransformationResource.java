@@ -26,7 +26,6 @@ import net.rossonet.operator.model.StaticUtils;
 @KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
 public class SimpleTransformationResource extends CRUKubernetesDependentResource<Job, KettleTransformation> {
 	private static final Logger logger = Logger.getLogger(SimpleTransformationResource.class.getName());
-	private static final String REPOSITORIES_VOLUME_NAME = "repositories-config";
 
 	public SimpleTransformationResource() {
 		super(Job.class);
@@ -56,7 +55,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			final List<VolumeMount> volumesList = new ArrayList<>();
 			final List<Volume> volumes = new ArrayList<>();
 			final Volume volume = new Volume();
-			volume.setName(REPOSITORIES_VOLUME_NAME);
+			volume.setName(StaticUtils.REPOSITORIES_VOLUME_NAME);
 			final ConfigMapVolumeSource configMapSource = new ConfigMapVolumeSource();
 			final List<KeyToPath> items = new ArrayList<>();
 			final KeyToPath item = new KeyToPath();
@@ -71,7 +70,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			final VolumeMount volumeRepositories = new VolumeMount();
 			volumeRepositories.setMountPath("/root/.kettle");
 			volumeRepositories.setReadOnly(true);
-			volumeRepositories.setName(REPOSITORIES_VOLUME_NAME);
+			volumeRepositories.setName(StaticUtils.REPOSITORIES_VOLUME_NAME);
 			volumesList.add(volumeRepositories);
 			container.setVolumeMounts(volumesList);
 			podSpec.setContainers(Arrays.asList(new Container[] { container }));

@@ -1,30 +1,23 @@
 package net.rossonet.operator.model.simple.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class KettleTransformationStatus {
 
-	private String errorMessage = null;
-
-	private long executionTimeMs = 0;
+	private List<String> messages = new ArrayList<>();
 	private String returnCode = "INIT";
 
-	public String getErrorMessage() {
-		return errorMessage;
-	}
-
-	public long getExecutionTimeMs() {
-		return executionTimeMs;
+	public List<String> getMessages() {
+		return messages;
 	}
 
 	public String getReturnCode() {
 		return returnCode;
 	}
 
-	public void setErrorMessage(final String errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
-	public void setExecutionTimeMs(final long executionTimeMs) {
-		this.executionTimeMs = executionTimeMs;
+	public void setMessages(final List<String> messages) {
+		this.messages = messages;
 	}
 
 	public void setReturnCode(final String returnCode) {
@@ -33,8 +26,19 @@ public class KettleTransformationStatus {
 
 	@Override
 	public String toString() {
-		return "KettleTransformationStatus [errorMessage=" + errorMessage + ", executionTimeMs=" + executionTimeMs
-				+ ", returnCode=" + returnCode + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("KettleTransformationStatus [");
+		if (messages != null) {
+			builder.append("messages=");
+			builder.append(messages);
+			builder.append(", ");
+		}
+		if (returnCode != null) {
+			builder.append("returnCode=");
+			builder.append(returnCode);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

@@ -203,10 +203,10 @@ spec:
             type: object
           status:
             properties:
-              errorMessage:
-                type: string
-              executionTimeMs:
-                type: integer
+              messages:
+                items:
+                  type: string
+                type: array
               returnCode:
                 type: string
             type: object
@@ -316,10 +316,10 @@ spec:
             type: object
           status:
             properties:
-              errorMessage:
-                type: string
-              executionTimeMs:
-                type: integer
+              messages:
+                items:
+                  type: string
+                type: array
               returnCode:
                 type: string
             type: object
@@ -367,10 +367,10 @@ spec:
             type: object
           status:
             properties:
-              errorMessage:
-                type: string
-              executionTimeMs:
-                type: integer
+              messages:
+                items:
+                  type: string
+                type: array
               returnCode:
                 type: string
             type: object
@@ -471,10 +471,10 @@ spec:
             type: object
           status:
             properties:
-              errorMessage:
-                type: string
-              executionTimeMs:
-                type: integer
+              messages:
+                items:
+                  type: string
+                type: array
               returnCode:
                 type: string
             type: object
@@ -537,10 +537,10 @@ spec:
             type: object
           status:
             properties:
-              errorMessage:
-                type: string
-              lastBackupTime:
-                type: string
+              messages:
+                items:
+                  type: string
+                type: array
               returnCode:
                 type: string
               totalJobs:
@@ -647,10 +647,10 @@ spec:
             type: object
           status:
             properties:
-              errorMessage:
-                type: string
-              executionTimeMs:
-                type: integer
+              messages:
+                items:
+                  type: string
+                type: array
               returnCode:
                 type: string
             type: object
