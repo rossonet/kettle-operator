@@ -75,6 +75,7 @@ rules:
   - pods/exec
   - jobs
   - cronjobs
+  - configmaps
   verbs:
   - '*'
 - apiGroups:
@@ -574,9 +575,6 @@ spec:
         properties:
           spec:
             properties:
-              definedRepository:
-                description: Kettle Repository managed by Kubernetes
-                type: string
               dir:
                 description: "The repository directory that contains the transformation,\
                   \ including the leading slash"

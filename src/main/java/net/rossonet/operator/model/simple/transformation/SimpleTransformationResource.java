@@ -40,16 +40,17 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 		try {
 			logger.info("kettle transformation " + kettleTransformation);
 			job.setMetadata(new ObjectMeta());
-			job.getMetadata().setName(kettleTransformation.getMetadata().getName());
+			final String transformationName = kettleTransformation.getMetadata().getName();
+			job.getMetadata().setName(transformationName);
 			job.getMetadata().setNamespace(kettleTransformation.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
 			labels.put(StaticUtils.LABEL_MANAGED_BY, StaticUtils.DATA_MANAGED_BY);
-			labels.put(StaticUtils.LABEL_APP, kettleTransformation.getMetadata().getName());
-			labels.put(StaticUtils.LABEL_PART_OF, kettleTransformation.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_APP, transformationName);
+			labels.put(StaticUtils.LABEL_PART_OF, transformationName);
 			job.getMetadata().setLabels(labels);
 			final PodSpec podSpec = new PodSpec();
 			final Container container = new Container();
-			container.setName(kettleTransformation.getMetadata().getName());
+			container.setName(transformationName);
 			container.setImage(kettleTransformation.getSpec().getImage());
 			container.setCommand(StaticUtils.createTransformationCommand(kettleTransformation));
 			final List<VolumeMount> volumesList = new ArrayList<>();
@@ -63,6 +64,7 @@ public class SimpleTransformationResource extends CRUKubernetesDependentResource
 			item.setPath("repositories.xml");
 			items.add(item);
 			configMapSource.setItems(items);
+			configMapSource.setName(transformationName);
 			volume.setConfigMap(configMapSource);
 			volumes.add(volume);
 			podSpec.setVolumes(volumes);

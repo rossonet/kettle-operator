@@ -75,6 +75,7 @@ rules:
   - pods/exec
   - jobs
   - cronjobs
+  - configmaps
   verbs:
   - '*'
 - apiGroups:
