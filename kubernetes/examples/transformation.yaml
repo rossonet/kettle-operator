@@ -4,21 +4,21 @@ metadata:
   name: trasformation-example1
   namespace: test-namespace
 spec:
-  dir: dir-value
-  exprep: exprep-value
-  file:	file-value
-  #image: image-value
-  level: level-value
-  listdir: listdir-value 
-  listrep: listrep-value
-  listtrans: listtrans-value
-  logfile: logfile-value
-  norep: norep-value1
-  pass: pass-value3
-  param: ["pir1=120","par2=ciao","terzo=12"]
-  rep: rep-value
-  safemode: savemode-value2
-  trans: trans-value2
-  user:	user-value
-  version: version-value
-
+  dir: /examples # The repository directory that contains the transformation, including the leading slash
+  #exprep: Y # Exports all repository objects to one XML file
+  file:	transformation_example # If you are calling a local KTR file, this is the filename, including the path if it is not in the local directory
+  #image: rossonet/kettle-runner:latest # docker image default is https://hub.docker.com/r/rossonet/kettle-runner
+  level: Debug # The logging level (Basic, Detailed, Debug, Rowlevel, Error, Nothing)
+  #listdir: Y # Lists the directories in the specified repository
+  #listrep: Y # Lists the available repositories
+  #listtrans: Y # Lists the transformations in the specified repository directory
+  #logfile: file.log # A local filename to write log output to
+  #norep: Y # Prevents Pan from logging into a repository
+  pass: admin # Repository password
+  #param: ["parameter1=120","p2=ciao","parameter3=12"] # Set a named parameter in a name=value format. For example: -param:FOO=bar
+  rep: repository-example1 # Enterprise or database repository name, if you are using one
+  #safemode: Y # Runs in safe mode, which enables extra checking
+  trans: transformation_example # The name of the transformation (as it appears in the repository) to launch
+  user: admin # Repository username
+  #version: Y # Shows the version, revision, and build date
+  #xmlRepository: ... # XML with repositories configuration

@@ -7,10 +7,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import net.rossonet.operator.model.KettleWork;
 
 public class KettleJobSpec {
-
-	@JsonPropertyDescription("Kettle Repository managed by Kubernetes")
-	private String definedRepository = null;
-
 	/**
 	 * The repository directory that contains the job, including the leading slash
 	 */
@@ -86,10 +82,6 @@ public class KettleJobSpec {
 	@JsonPropertyDescription("XML with repositories configuration")
 	private String xmlRepository = null;
 
-	public String getDefinedRepository() {
-		return definedRepository;
-	}
-
 	public String getDir() {
 		return dir;
 	}
@@ -156,10 +148,6 @@ public class KettleJobSpec {
 
 	public String getXmlRepository() {
 		return xmlRepository;
-	}
-
-	public void setDefinedRepository(final String definedRepository) {
-		this.definedRepository = definedRepository;
 	}
 
 	public void setDir(final String dir) {
@@ -233,9 +221,7 @@ public class KettleJobSpec {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("KettleJobSpec [definedRepository=");
-		builder.append(definedRepository);
-		builder.append(", dir=");
+		builder.append("KettleJobSpec [dir=");
 		builder.append(dir);
 		builder.append(", export=");
 		builder.append(export);

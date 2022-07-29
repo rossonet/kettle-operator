@@ -10,8 +10,6 @@ import net.rossonet.operator.model.KettleWork;
 
 public class CronKettleTransformationSpec {
 
-	@JsonPropertyDescription("Kettle Repository managed by Kubernetes")
-	private String definedRepository = null;
 	/**
 	 * The repository directory that contains the transformation, including the
 	 * leading slash
@@ -102,10 +100,6 @@ public class CronKettleTransformationSpec {
 	@JsonPropertyDescription("XML with repositories configuration")
 	private String xmlRepository = null;
 
-	public String getDefinedRepository() {
-		return definedRepository;
-	}
-
 	public String getDir() {
 		return dir;
 	}
@@ -180,10 +174,6 @@ public class CronKettleTransformationSpec {
 
 	public String getXmlRepository() {
 		return xmlRepository;
-	}
-
-	public void setDefinedRepository(final String definedRepository) {
-		this.definedRepository = definedRepository;
 	}
 
 	public void setDir(final String dir) {
@@ -266,7 +256,6 @@ public class CronKettleTransformationSpec {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("CronKettleTransformationSpec [definedRepository=");
-		builder.append(definedRepository);
 		builder.append(", dir=");
 		builder.append(dir);
 		builder.append(", exprep=");

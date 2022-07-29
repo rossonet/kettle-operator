@@ -70,7 +70,7 @@ public class SimpleCronTransformationResource
 			podSpec.setVolumes(volumes);
 			final VolumeMount volumeRepositories = new VolumeMount();
 			volumeRepositories.setMountPath("/root/.kettle");
-			volumeRepositories.setReadOnly(true);
+			volumeRepositories.setReadOnly(false);
 			volumeRepositories.setName(StaticUtils.REPOSITORIES_VOLUME_NAME);
 			volumesList.add(volumeRepositories);
 			container.setVolumeMounts(volumesList);

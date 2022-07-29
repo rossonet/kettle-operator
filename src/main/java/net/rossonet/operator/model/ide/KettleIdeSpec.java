@@ -20,6 +20,9 @@ public class KettleIdeSpec {
 	@JsonPropertyDescription("Repositories managed by this ide")
 	private String[] repositories = null;
 
+	@JsonPropertyDescription("XML with repositories configuration")
+	private String xmlRepository = null;
+
 	public String getHost() {
 		return host;
 	}
@@ -34,6 +37,10 @@ public class KettleIdeSpec {
 
 	public String[] getRepositories() {
 		return repositories;
+	}
+
+	public String getXmlRepository() {
+		return xmlRepository;
 	}
 
 	public void setHost(final String host) {
@@ -52,10 +59,40 @@ public class KettleIdeSpec {
 		this.repositories = repositories;
 	}
 
+	public void setXmlRepository(final String xmlRepository) {
+		this.xmlRepository = xmlRepository;
+	}
+
 	@Override
 	public String toString() {
-		return "KettleIdeSpec [host=" + host + ", image=" + image + ", path=" + path + ", repositories="
-				+ Arrays.toString(repositories) + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("KettleIdeSpec [");
+		if (host != null) {
+			builder.append("host=");
+			builder.append(host);
+			builder.append(", ");
+		}
+		if (image != null) {
+			builder.append("image=");
+			builder.append(image);
+			builder.append(", ");
+		}
+		if (path != null) {
+			builder.append("path=");
+			builder.append(path);
+			builder.append(", ");
+		}
+		if (xmlRepository != null) {
+			builder.append("xmlRepository=");
+			builder.append(xmlRepository);
+			builder.append(", ");
+		}
+		if (repositories != null) {
+			builder.append("repositories=");
+			builder.append(Arrays.toString(repositories));
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

@@ -42,7 +42,10 @@ public class KettleIdeReconciler implements Reconciler<KettleIde> {
 					&& deploymentIde.getStatus().getReadyReplicas() != null
 					&& deploymentIde.getStatus().getReadyReplicas() > 0 && serviceIde != null) {
 				StaticUtils.createKettleConfigurationDirectory(kubernetesClient, deploymentIde);
-				final String xmlRepositories = StaticUtils.repositoriesManagement(kubernetesClient, resource);
+				String xmlRepositories = StaticUtils.repositoriesManagement(kubernetesClient, resource);
+				if (resource.getSpec().getXmlRepository() != null && !resource.getSpec().getXmlRepository().isEmpty()) {
+					xmlRepositories = resource.getSpec().getXmlRepository();
+				}
 				StaticUtils.saveStringToFileOnDeployment(kubernetesClient, deploymentIde, xmlRepositories,
 						"/root/.kettle/repositories.xml");
 			} else {
