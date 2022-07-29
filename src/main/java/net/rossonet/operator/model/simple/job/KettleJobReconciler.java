@@ -39,7 +39,7 @@ public class KettleJobReconciler implements Reconciler<KettleJob> {
 			final ConfigMap configMap = context.getSecondaryResource(ConfigMap.class).get();
 			logger.fine("repository.xml in config map  " + configMap.getData().get(StaticUtils.REPOSITORIES));
 			final Job job = context.getSecondaryResource(Job.class).get();
-			resource.setStatus(StaticUtils.createKettleJobStatus(job));
+			resource.setStatus(StaticUtils.createKettleJobStatus(resource.getStatus(), job));
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));

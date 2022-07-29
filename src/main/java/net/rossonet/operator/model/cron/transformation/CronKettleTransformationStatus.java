@@ -5,23 +5,52 @@ import java.util.List;
 
 public class CronKettleTransformationStatus {
 
+	public enum ReturnCode {
+		CODE0("The transformation ran without a problem"), CODE1("Errors occurred during processing"),
+		CODE2("An unexpected error occurred during loading / running of the transformation"),
+		CODE3("Unable to prepare and initialize this transformation"),
+		CODE7("The transformation couldn't be loaded from XML or the Repository"),
+		CODE8("Error loading steps or plugins (error in loading one of the plugins mostly)"),
+		CODE9("Command line usage printing");
+
+		private final String message;
+
+		ReturnCode(final String message) {
+			this.message = message;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+	}
+
 	private List<String> messages = new ArrayList<>();
-	private String returnCode = "INIT";
+	private Integer returnCode = null;
+
+	private String returnCodeDescription = "INIT";
 
 	public List<String> getMessages() {
 		return messages;
 	}
 
-	public String getReturnCode() {
+	public Integer getReturnCode() {
 		return returnCode;
+	}
+
+	public String getReturnCodeDescription() {
+		return returnCodeDescription;
 	}
 
 	public void setMessages(final List<String> messages) {
 		this.messages = messages;
 	}
 
-	public void setReturnCode(final String returnCode) {
+	public void setReturnCode(final Integer returnCode) {
 		this.returnCode = returnCode;
+	}
+
+	public void setReturnCodeDescription(final String returnCodeDescription) {
+		this.returnCodeDescription = returnCodeDescription;
 	}
 
 	@Override
@@ -36,6 +65,11 @@ public class CronKettleTransformationStatus {
 		if (returnCode != null) {
 			builder.append("returnCode=");
 			builder.append(returnCode);
+			builder.append(", ");
+		}
+		if (returnCodeDescription != null) {
+			builder.append("returnCodeDescription=");
+			builder.append(returnCodeDescription);
 		}
 		builder.append("]");
 		return builder.toString();

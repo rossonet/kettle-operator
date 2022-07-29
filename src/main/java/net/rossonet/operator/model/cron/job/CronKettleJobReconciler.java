@@ -39,7 +39,7 @@ public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 			final CronJob job = context.getSecondaryResource(CronJob.class).get();
 			final ConfigMap configMap = context.getSecondaryResource(ConfigMap.class).get();
 			logger.fine("repository.xml in config map  " + configMap.getData().get(StaticUtils.REPOSITORIES));
-			resource.setStatus(StaticUtils.createCronKettleJobStatus(job));
+			resource.setStatus(StaticUtils.createCronKettleJobStatus(resource.getStatus(), job));
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));

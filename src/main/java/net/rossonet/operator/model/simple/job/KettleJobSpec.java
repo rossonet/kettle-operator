@@ -67,7 +67,7 @@ public class KettleJobSpec {
 	private String norep = null;
 	/** Set a named parameter in a name=value format. For */
 	@JsonPropertyDescription("Set a named parameter in a name=value format. For")
-	private String param = null;
+	private String[] param = null;
 	/** Repository password */
 	@JsonPropertyDescription("Repository password")
 	private String pass = null;
@@ -134,7 +134,7 @@ public class KettleJobSpec {
 		return norep;
 	}
 
-	public String getParam() {
+	public String[] getParam() {
 		return param;
 	}
 
@@ -206,7 +206,7 @@ public class KettleJobSpec {
 		this.norep = norep;
 	}
 
-	public void setParam(final String param) {
+	public void setParam(final String[] param) {
 		this.param = param;
 	}
 

@@ -40,7 +40,7 @@ public class CronKettleTransformationReconciler implements Reconciler<CronKettle
 			final CronJob job = context.getSecondaryResource(CronJob.class).get();
 			final ConfigMap configMap = context.getSecondaryResource(ConfigMap.class).get();
 			logger.fine("repository.xml in config map  " + configMap.getData().get(StaticUtils.REPOSITORIES));
-			resource.setStatus(StaticUtils.createCronKettleTransformationStatus(job));
+			resource.setStatus(StaticUtils.createCronKettleTransformationStatus(resource.getStatus(), job));
 			return UpdateControl.patchStatus(resource);
 		} catch (final Exception ee) {
 			logger.severe(LogUtils.stackTraceToString(ee));

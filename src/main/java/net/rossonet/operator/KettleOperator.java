@@ -1,6 +1,7 @@
 package net.rossonet.operator;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,6 +78,7 @@ import io.fabric8.openshift.client.OpenShiftWhereaboutsAPIGroupExtensionAdapter;
 import io.fabric8.openshift.client.V1OpenShiftClusterAutoscalingAPIGroupExtensionAdapter;
 import io.fabric8.openshift.client.V1beta1OpenShiftClusterAutoscalingAPIGroupExtensionAdapter;
 import io.javaoperatorsdk.operator.Operator;
+import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.cron.job.CronKettleJobReconciler;
 import net.rossonet.operator.model.cron.transformation.CronKettleTransformationReconciler;
 import net.rossonet.operator.model.ide.KettleIdeReconciler;
@@ -85,6 +87,8 @@ import net.rossonet.operator.model.simple.job.KettleJobReconciler;
 import net.rossonet.operator.model.simple.transformation.KettleTransformationReconciler;
 
 public class KettleOperator {
+
+	private static final String CRD_KETTLE_OPERATOR_CRD_YAML = "crd/kettle-operator-crd.yaml";
 
 	private static final Logger logger = Logger.getLogger(KettleOperator.class.getName());
 
@@ -135,6 +139,17 @@ public class KettleOperator {
 		return usedClient;
 	}
 
+	private static void loadCustorResourceDefinitionFiles() {
+		try {
+			final ClassLoader classLoader = KettleOperator.class.getClassLoader();
+			final InputStream configFile = classLoader.getResourceAsStream(CRD_KETTLE_OPERATOR_CRD_YAML);
+			usedClient.load(configFile).createOrReplace();
+			logger.info("CRD loaded");
+		} catch (final Exception e) {
+			logger.severe(LogUtils.stackTraceToString(e));
+		}
+	}
+
 	public static void main(final String[] args) throws IOException {
 		logger.info("operator init");
 		try {
@@ -161,8 +176,10 @@ public class KettleOperator {
 
 	public static void setUsedClient(final KubernetesClient usedClient) {
 		KettleOperator.usedClient = usedClient;
+		loadCustorResourceDefinitionFiles();
 	}
 
+	// the follow just to have the classes in class loader for the reflection.
 	@SuppressWarnings("unused")
 	private final AdmissionRegistrationAPIGroupExtensionAdapter AdmissionRegistrationAPIGroupExtensionAdapter = null;
 	@SuppressWarnings("unused")

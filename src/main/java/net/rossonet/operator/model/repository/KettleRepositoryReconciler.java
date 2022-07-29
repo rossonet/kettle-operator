@@ -138,7 +138,7 @@ public class KettleRepositoryReconciler implements Reconciler<KettleRepository> 
 			logger.fine("reconciler  " + resource + " -> " + context);
 			final Deployment deploymentDatabase = context.getSecondaryResource(Deployment.class).get();
 			final Service serviceDatabase = context.getSecondaryResource(Service.class).get();
-			resource.setStatus(StaticUtils.createKettleRepositoryStatus(deploymentDatabase));
+			resource.setStatus(StaticUtils.createKettleRepositoryStatus(resource.getStatus(), deploymentDatabase));
 			if (deploymentDatabase != null && deploymentDatabase.getStatus() != null
 					&& deploymentDatabase.getStatus().getReadyReplicas() != null
 					&& deploymentDatabase.getStatus().getReadyReplicas() > 0 && serviceDatabase != null) {
