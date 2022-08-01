@@ -14,11 +14,11 @@ import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
-public class RepositoriesConfigMapResource extends CRUKubernetesDependentResource<ConfigMap, CronKettleTransformation> {
+public class RepositoriesCronTransformationConfigMapResource extends CRUKubernetesDependentResource<ConfigMap, CronKettleTransformation> {
 
-	private static final Logger logger = Logger.getLogger(RepositoriesConfigMapResource.class.getName());
+	private static final Logger logger = Logger.getLogger(RepositoriesCronTransformationConfigMapResource.class.getName());
 
-	public RepositoriesConfigMapResource() {
+	public RepositoriesCronTransformationConfigMapResource() {
 		super(ConfigMap.class);
 		logger.info("ConfigMap class created");
 	}

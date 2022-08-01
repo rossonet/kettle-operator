@@ -14,10 +14,9 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
-import net.rossonet.operator.model.simple.transformation.RepositoriesConfigMapResource;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleJobResource.class),
-		@Dependent(type = RepositoriesConfigMapResource.class) })
+		@Dependent(type = RepositoriesJobConfigMapResource.class) })
 public class KettleJobReconciler implements Reconciler<KettleJob> {
 	private static final Logger logger = Logger.getLogger(KettleJobReconciler.class.getName());
 

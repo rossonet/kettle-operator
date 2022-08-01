@@ -16,7 +16,7 @@ import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleTransformationResource.class),
-		@Dependent(type = RepositoriesConfigMapResource.class) })
+		@Dependent(type = RepositoriesTransformationConfigMapResource.class) })
 public class KettleTransformationReconciler implements Reconciler<KettleTransformation> {
 	private static final Logger logger = Logger.getLogger(KettleTransformationReconciler.class.getName());
 

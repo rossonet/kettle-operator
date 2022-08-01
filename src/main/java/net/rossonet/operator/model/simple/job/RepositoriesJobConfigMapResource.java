@@ -1,4 +1,4 @@
-package net.rossonet.operator.model.cron.job;
+package net.rossonet.operator.model.simple.job;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,34 +14,33 @@ import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
 
 @KubernetesDependent(labelSelector = StaticUtils.SELECTOR)
-public class RepositoriesConfigMapResource extends CRUKubernetesDependentResource<ConfigMap, CronKettleJob> {
+public class RepositoriesJobConfigMapResource extends CRUKubernetesDependentResource<ConfigMap, KettleJob> {
 
-	private static final Logger logger = Logger.getLogger(RepositoriesConfigMapResource.class.getName());
+	private static final Logger logger = Logger.getLogger(RepositoriesJobConfigMapResource.class.getName());
 
-	public RepositoriesConfigMapResource() {
+	public RepositoriesJobConfigMapResource() {
 		super(ConfigMap.class);
 		logger.info("ConfigMap class created");
 	}
 
 	@Override
-	protected ConfigMap desired(final CronKettleJob kettleCronJob, final Context<CronKettleJob> context) {
+	protected ConfigMap desired(final KettleJob kettleJob, final Context<KettleJob> context) {
 		final ConfigMap configMap = new ConfigMap();
 		try {
-			logger.fine("kettle cron job " + kettleCronJob);
+			logger.fine("kettle job " + kettleJob);
 			configMap.setMetadata(new ObjectMeta());
-			configMap.getMetadata().setName(kettleCronJob.getMetadata().getName());
-			configMap.getMetadata().setNamespace(kettleCronJob.getMetadata().getNamespace());
+			configMap.getMetadata().setName(kettleJob.getMetadata().getName());
+			configMap.getMetadata().setNamespace(kettleJob.getMetadata().getNamespace());
 			final Map<String, String> labels = new HashMap<>();
 			labels.put(StaticUtils.LABEL_MANAGED_BY, StaticUtils.DATA_MANAGED_BY);
-			labels.put(StaticUtils.LABEL_APP, kettleCronJob.getMetadata().getName());
-			labels.put(StaticUtils.LABEL_PART_OF, kettleCronJob.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_APP, kettleJob.getMetadata().getName());
+			labels.put(StaticUtils.LABEL_PART_OF, kettleJob.getMetadata().getName());
 			configMap.getMetadata().setLabels(labels);
 			String xmlRepositories = "";
-			if (kettleCronJob.getSpec().getXmlRepository() != null
-					&& !kettleCronJob.getSpec().getXmlRepository().isEmpty()) {
-				xmlRepositories = kettleCronJob.getSpec().getXmlRepository();
+			if (kettleJob.getSpec().getXmlRepository() != null && !kettleJob.getSpec().getXmlRepository().isEmpty()) {
+				xmlRepositories = kettleJob.getSpec().getXmlRepository();
 			} else {
-				xmlRepositories = StaticUtils.repositoriesManagement(KettleOperator.getUsedClient(), kettleCronJob);
+				xmlRepositories = StaticUtils.repositoriesManagement(KettleOperator.getUsedClient(), kettleJob);
 			}
 			final Map<String, String> dataMap = new HashMap<>();
 			dataMap.put(StaticUtils.REPOSITORIES, xmlRepositories);

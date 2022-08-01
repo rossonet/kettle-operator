@@ -14,10 +14,9 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import net.rossonet.operator.model.LogUtils;
 import net.rossonet.operator.model.StaticUtils;
-import net.rossonet.operator.model.simple.transformation.RepositoriesConfigMapResource;
 
 @ControllerConfiguration(dependents = { @Dependent(type = SimpleCronJobResource.class),
-		@Dependent(type = RepositoriesConfigMapResource.class) })
+		@Dependent(type = RepositoriesCronJobConfigMapResource.class) })
 public class CronKettleJobReconciler implements Reconciler<CronKettleJob> {
 	private static final Logger logger = Logger.getLogger(CronKettleJobReconciler.class.getName());
 

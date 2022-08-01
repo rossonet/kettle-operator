@@ -187,9 +187,6 @@ public class StaticUtils {
 		if (checkValidStringParameter(commandParameters.getDir())) {
 			command.append(" -dir='" + commandParameters.getDir() + "'");
 		}
-		if (checkValidStringParameter(commandParameters.getExport())) {
-			command.append(" -export='" + commandParameters.getExport() + "'");
-		}
 		if (checkValidStringParameter(commandParameters.getFile())) {
 			command.append(" -file='" + commandParameters.getFile() + "'");
 		}
@@ -324,9 +321,6 @@ public class StaticUtils {
 		command.append(" " + BASE_COMMAND_DIRECTORY + "/kitchen.sh");
 		if (checkValidStringParameter(commandParameters.getDir())) {
 			command.append(" -dir='" + commandParameters.getDir() + "'");
-		}
-		if (checkValidStringParameter(commandParameters.getExport())) {
-			command.append(" -export='" + commandParameters.getExport() + "'");
 		}
 		if (checkValidStringParameter(commandParameters.getFile())) {
 			command.append(" -file='" + commandParameters.getFile() + "'");

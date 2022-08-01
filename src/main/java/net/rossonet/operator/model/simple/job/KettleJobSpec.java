@@ -14,12 +14,6 @@ public class KettleJobSpec {
 	@NotNull
 	private String dir = null;
 	/**
-	 * Exports all linked resources of the specified job. The argument is the name
-	 * of a ZIP file.
-	 */
-	@JsonPropertyDescription("Exports all linked resources of the specified job. The argument is the name of a ZIP file.")
-	private String export = null;
-	/**
 	 * If you are calling a local KJB file, this is the filename, including the path
 	 * if it is not in the local directory
 	 */
@@ -86,10 +80,6 @@ public class KettleJobSpec {
 		return dir;
 	}
 
-	public String getExport() {
-		return export;
-	}
-
 	public String getFile() {
 		return file;
 	}
@@ -152,10 +142,6 @@ public class KettleJobSpec {
 
 	public void setDir(final String dir) {
 		this.dir = dir;
-	}
-
-	public void setExport(final String export) {
-		this.export = export;
 	}
 
 	public void setFile(final String file) {
@@ -223,8 +209,6 @@ public class KettleJobSpec {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("KettleJobSpec [dir=");
 		builder.append(dir);
-		builder.append(", export=");
-		builder.append(export);
 		builder.append(", file=");
 		builder.append(file);
 		builder.append(", image=");
