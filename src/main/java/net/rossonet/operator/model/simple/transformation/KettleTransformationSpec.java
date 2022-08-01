@@ -2,8 +2,6 @@ package net.rossonet.operator.model.simple.transformation;
 
 import java.util.Arrays;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import net.rossonet.operator.model.KettleWork;
@@ -15,7 +13,6 @@ public class KettleTransformationSpec {
 	 * leading slash
 	 */
 	@JsonPropertyDescription("The repository directory that contains the transformation, including the leading slash")
-	@NotNull
 	private String dir = null;
 
 	/** Exports all repository objects to one XML file */
