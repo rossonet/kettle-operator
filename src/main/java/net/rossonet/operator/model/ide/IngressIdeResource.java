@@ -48,7 +48,7 @@ public class IngressIdeResource extends CRUKubernetesDependentResource<Ingress, 
 			final IngressServiceBackend service = new IngressServiceBackend();
 			service.setName(kettleIde.getMetadata().getName());
 			final ServiceBackendPort servicePort = new ServiceBackendPort();
-			servicePort.setNumber(80);
+			servicePort.setNumber(kettleIde.getSpec().getServicePort());
 			service.setPort(servicePort);
 			backend.setService(service);
 			spec.setDefaultBackend(backend);

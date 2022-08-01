@@ -1,7 +1,5 @@
 package net.rossonet.operator.model.ide;
 
-import java.util.Arrays;
-
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import net.rossonet.operator.model.KettleWork;
@@ -17,8 +15,8 @@ public class KettleIdeSpec {
 	@JsonPropertyDescription("Ingress path")
 	private String path = "/";
 
-	@JsonPropertyDescription("Repositories managed by this ide")
-	private String[] repositories = null;
+	@JsonPropertyDescription("Ingress service port")
+	private Integer servicePort = 80;
 
 	@JsonPropertyDescription("XML with repositories configuration")
 	private String xmlRepository = null;
@@ -35,8 +33,8 @@ public class KettleIdeSpec {
 		return path;
 	}
 
-	public String[] getRepositories() {
-		return repositories;
+	public Integer getServicePort() {
+		return servicePort;
 	}
 
 	public String getXmlRepository() {
@@ -55,8 +53,8 @@ public class KettleIdeSpec {
 		this.path = path;
 	}
 
-	public void setRepositories(final String[] repositories) {
-		this.repositories = repositories;
+	public void setServicePort(final Integer servicePort) {
+		this.servicePort = servicePort;
 	}
 
 	public void setXmlRepository(final String xmlRepository) {
@@ -72,6 +70,11 @@ public class KettleIdeSpec {
 			builder.append(host);
 			builder.append(", ");
 		}
+		if (servicePort != null) {
+			builder.append("servicePort=");
+			builder.append(servicePort);
+			builder.append(", ");
+		}
 		if (image != null) {
 			builder.append("image=");
 			builder.append(image);
@@ -85,11 +88,6 @@ public class KettleIdeSpec {
 		if (xmlRepository != null) {
 			builder.append("xmlRepository=");
 			builder.append(xmlRepository);
-			builder.append(", ");
-		}
-		if (repositories != null) {
-			builder.append("repositories=");
-			builder.append(Arrays.toString(repositories));
 		}
 		builder.append("]");
 		return builder.toString();

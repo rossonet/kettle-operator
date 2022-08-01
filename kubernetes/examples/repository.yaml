@@ -4,11 +4,12 @@ metadata:
   name: repository-example1
   namespace: test-namespace
 spec:
-  #image: image-value
-  repositoryUrl: https://www.rossonet.net/dati/pdi/repository/kettle.sql.gz
-  username: rossonet
-  password: password1
-  databaseName: kettle
-  replicas: 1
-  repositoryUsername: kettle_user
-  repositoryPassword: password1
+  #image: "rossonet/kettle-repository:latest" # docker image default is https://hub.docker.com/r/rossonet/kettle-repository
+  repositoryUrl: "https://www.rossonet.net/dati/pdi/repository/kettle.sql.gz" # repository url to get the data. Should start with the protocol 'git-ssh://', 'git-http://', 'git-https://', 's3://','ftp://', 'http://', 'https://' or 'file://'. If the file name terminate with .sql.gz the appropiate decompression is applied
+  username: "rossonet" # Database username
+  password: "password1" # Database password
+  databaseName: "kettle" # Database name
+  replicas: 1 # Number of database pods
+  repositoryUsername: "kettle_user" # username to get the database dump from repository
+  repositoryPassword: "password1" # password to get the database dump from repository
+  # repositorySshCertificate: ... # ssh certicate to get the database dump from git

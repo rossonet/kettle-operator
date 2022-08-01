@@ -4,5 +4,8 @@ metadata:
   name: ide-example1
   namespace: test-namespace
 spec:
-  #image: image-value
-  path: /ide1
+  #image: "rossonet/kettle-vnc:latest" # docker image default is https://hub.docker.com/r/rossonet/kettle-vnc
+  #host: "ide1.demo1.rossonet.com" # Ingress host
+  path: "/ide1" # Ingress path
+  servicePort: 443 # Ingress service port
+  #xmlRepository: ... # XML with repositories configuration
