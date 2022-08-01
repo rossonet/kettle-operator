@@ -16,9 +16,9 @@ spec:
   #norep: "Y" # Prevents Pan from logging into a repository
   pass: "admin" # Repository password
   #param: ["parameter1=120","p2=ciao","parameter3=12"] # Set a named parameter in a name=value format. For example: -param:FOO=bar
-  rep: "repository-example1" # Enterprise or database repository name, if you are using one
+  rep: "Repository repository-example1" # Enterprise or database repository name, if you are using one
   #safemode: "Y" # Runs in safe mode, which enables extra checking
-  #trans: "transformation_example" # The name of the transformation (as it appears in the repository) to launch
+  trans: "transformation_example" # The name of the transformation (as it appears in the repository) to launch
   user: "admin" # Repository username
   version: "Y" # Shows the version, revision, and build date
   #xmlRepository: ... # XML with repositories configuration

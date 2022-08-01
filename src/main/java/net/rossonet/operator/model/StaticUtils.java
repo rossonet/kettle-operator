@@ -43,42 +43,6 @@ import net.rossonet.operator.model.simple.transformation.KettleTransformationSta
 
 public class StaticUtils {
 
-	private static class ExecPodListener implements ExecListener {
-		private final CountDownLatch execLatch;
-
-		public ExecPodListener(final CountDownLatch execLatch) {
-			this.execLatch = execLatch;
-		}
-
-		public CountDownLatch getExecLatch() {
-			return execLatch;
-		}
-
-		@Override
-		public void onClose(final int i, final String s) {
-			logger.info("Shell Closing with return code " + i);
-			logger.info(s);
-			execLatch.countDown();
-		}
-
-		@Override
-		public void onFailure(final Throwable t, final Response failureResponse) {
-			logger.warning("Some error encountered");
-			logger.warning(LogUtils.stackTraceToString(t));
-			try {
-				logger.warning(failureResponse.body());
-			} catch (final IOException e) {
-				logger.warning(LogUtils.stackTraceToString(e));
-			}
-			execLatch.countDown();
-		}
-
-		@Override
-		public void onOpen() {
-			logger.info("Shell was opened");
-		}
-	}
-
 	public static class ExecResult {
 
 		private String[] command;
@@ -139,21 +103,51 @@ public class StaticUtils {
 
 	}
 
-	private static String BASE_COMMAND_DIRECTORY = "/data-integration";
+	private static class ExecPodListener implements ExecListener {
+		private final CountDownLatch execLatch;
+
+		public ExecPodListener(final CountDownLatch execLatch) {
+			this.execLatch = execLatch;
+		}
+
+		public CountDownLatch getExecLatch() {
+			return execLatch;
+		}
+
+		@Override
+		public void onClose(final int i, final String s) {
+			logger.info("Shell Closing with return code " + i);
+			logger.info(s);
+			execLatch.countDown();
+		}
+
+		@Override
+		public void onFailure(final Throwable t, final Response failureResponse) {
+			logger.warning("Some error encountered");
+			logger.warning(LogUtils.stackTraceToString(t));
+			try {
+				logger.warning(failureResponse.body());
+			} catch (final IOException e) {
+				logger.warning(LogUtils.stackTraceToString(e));
+			}
+			execLatch.countDown();
+		}
+
+		@Override
+		public void onOpen() {
+			logger.info("Shell was opened");
+		}
+	}
 
 	public static final String DATA_MANAGED_BY = "kettle-operator";
 
 	public static final String FILE = "file://";
-	private static String footerRepositories = "</repositories>\n";
 
 	public static final String FTP = "ftp://";
 	public static final String GIT_HTTP = "git-http://";
+
 	public static final String GIT_HTTPS = "git-https://";
-
 	public static final String GIT_SSH = "git-ssh://";
-
-	private static String headerRepositories = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<repositories>\n";
-
 	public static final String HTTP = "http://";
 
 	public static final String HTTPS = "https://";
@@ -164,8 +158,6 @@ public class StaticUtils {
 
 	public static final String LABEL_PART_OF = "app.kubernetes.io/part-of";
 
-	private static final Logger logger = Logger.getLogger(StaticUtils.class.getName());
-
 	public static final String REPOSITORIES = "repositories";
 
 	public static final String REPOSITORIES_VOLUME_NAME = "repositories-config";
@@ -174,9 +166,366 @@ public class StaticUtils {
 
 	public static final String SELECTOR = LABEL_MANAGED_BY + "=" + DATA_MANAGED_BY;
 
+	private static String BASE_COMMAND_DIRECTORY = "/data-integration";
+
+	private static String footerRepositories = "</repositories>\n";
+
+	private static String headerRepositories = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<repositories>\n";
+
+	private static final Logger logger = Logger.getLogger(StaticUtils.class.getName());
+
 	private static final String SYNCHRONIZED_FILE_MARK = "SYNCHRONIZED FILE FOUND";
 
 	private static final long TIMEOUT_CHECK_SECONDS = 60;
+
+	public static List<String> createCronJobCommandArguments(final CronKettleJob kettleJob) {
+		final CronKettleJobSpec commandParameters = kettleJob.getSpec();
+		final List<String> list = new ArrayList<>();
+		final StringBuilder command = new StringBuilder();
+		addRepositoryCopy(command);
+		command.append(" " + BASE_COMMAND_DIRECTORY + "/kitchen.sh");
+		if (checkValidStringParameter(commandParameters.getDir())) {
+			command.append(" -dir='" + commandParameters.getDir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getExport())) {
+			command.append(" -export='" + commandParameters.getExport() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getFile())) {
+			command.append(" -file='" + commandParameters.getFile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getJob())) {
+			command.append(" -job='" + commandParameters.getJob() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLevel())) {
+			command.append(" -level='" + commandParameters.getLevel() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListdir())) {
+			command.append(" -listdir='" + commandParameters.getListdir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListjob())) {
+			command.append(" -listjob='" + commandParameters.getListjob() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListrep())) {
+			command.append(" -listrep='" + commandParameters.getListrep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLogfile())) {
+			command.append(" -logfile='" + commandParameters.getLogfile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getNorep())) {
+			command.append(" -norep='" + commandParameters.getNorep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getPass())) {
+			command.append(" -pass='" + commandParameters.getPass() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getRep())) {
+			command.append(" -rep='" + commandParameters.getRep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getUser())) {
+			command.append(" -user='" + commandParameters.getUser() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getVersion())) {
+			command.append(" -version='" + commandParameters.getVersion() + "'");
+		}
+		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
+			for (final String singleParam : commandParameters.getParam()) {
+				command.append(" -param:'" + singleParam + "'");
+			}
+		}
+		list.add(command.toString());
+		return list;
+	}
+
+	public static CronKettleJobStatus createCronKettleJobStatus(final CronKettleJobStatus actualStatus,
+			final CronJob job) {
+		CronKettleJobStatus status = actualStatus;
+		if (status == null) {
+			status = new CronKettleJobStatus();
+		}
+		// TODO implementare logica
+		return status;
+	}
+
+	public static CronKettleTransformationStatus createCronKettleTransformationStatus(
+			final CronKettleTransformationStatus actualStatus, final CronJob job) {
+		CronKettleTransformationStatus status = actualStatus;
+		if (status == null) {
+			status = new CronKettleTransformationStatus();
+		}
+		// TODO implementare logica
+		return status;
+	}
+
+	public static List<String> createCronTransformationCommandArguments(
+			final CronKettleTransformation kettleTransformation) {
+		final CronKettleTransformationSpec commandParameters = kettleTransformation.getSpec();
+		final List<String> list = new ArrayList<>();
+		final StringBuilder command = new StringBuilder();
+		addRepositoryCopy(command);
+		command.append(" " + BASE_COMMAND_DIRECTORY + "/pan.sh");
+		if (checkValidStringParameter(commandParameters.getDir())) {
+			command.append(" -dir='" + commandParameters.getDir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getExprep())) {
+			command.append(" -exprep='" + commandParameters.getExprep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getFile())) {
+			command.append(" -file='" + commandParameters.getFile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLevel())) {
+			command.append(" -level='" + commandParameters.getLevel() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListdir())) {
+			command.append(" -listdir='" + commandParameters.getListdir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListrep())) {
+			command.append(" -listrep='" + commandParameters.getListrep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListtrans())) {
+			command.append(" -listtrans='" + commandParameters.getListtrans() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLogfile())) {
+			command.append(" -logfile='" + commandParameters.getLogfile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getNorep())) {
+			command.append(" -norep='" + commandParameters.getNorep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getPass())) {
+			command.append(" -pass='" + commandParameters.getPass() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getRep())) {
+			command.append(" -rep='" + commandParameters.getRep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getSafemode())) {
+			command.append(" -safemode='" + commandParameters.getSafemode() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getTrans())) {
+			command.append(" -trans='" + commandParameters.getTrans() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getUser())) {
+			command.append(" -user='" + commandParameters.getUser() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getVersion())) {
+			command.append(" -version='" + commandParameters.getVersion() + "'");
+		}
+		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
+			for (final String singleParam : commandParameters.getParam()) {
+				command.append(" -param:'" + singleParam + "'");
+			}
+		}
+		list.add(command.toString());
+		return list;
+	}
+
+	public static List<String> createJobCommandArguments(final KettleJob kettleJob) {
+		final KettleJobSpec commandParameters = kettleJob.getSpec();
+		final List<String> list = new ArrayList<>();
+		final StringBuilder command = new StringBuilder();
+		addRepositoryCopy(command);
+		command.append(" " + BASE_COMMAND_DIRECTORY + "/kitchen.sh");
+		if (checkValidStringParameter(commandParameters.getDir())) {
+			command.append(" -dir='" + commandParameters.getDir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getExport())) {
+			command.append(" -export='" + commandParameters.getExport() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getFile())) {
+			command.append(" -file='" + commandParameters.getFile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getJob())) {
+			command.append(" -job='" + commandParameters.getJob() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLevel())) {
+			command.append(" -level='" + commandParameters.getLevel() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListdir())) {
+			command.append(" -listdir='" + commandParameters.getListdir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListjob())) {
+			command.append(" -listjob='" + commandParameters.getListjob() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListrep())) {
+			command.append(" -listrep='" + commandParameters.getListrep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLogfile())) {
+			command.append(" -logfile='" + commandParameters.getLogfile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getNorep())) {
+			command.append(" -norep='" + commandParameters.getNorep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getPass())) {
+			command.append(" -pass='" + commandParameters.getPass() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getRep())) {
+			command.append(" -rep='" + commandParameters.getRep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getUser())) {
+			command.append(" -user='" + commandParameters.getUser() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getVersion())) {
+			command.append(" -version='" + commandParameters.getVersion() + "'");
+		}
+		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
+			for (final String singleParam : commandParameters.getParam()) {
+				command.append(" -param:'" + singleParam + "'");
+			}
+		}
+		list.add(command.toString());
+		return list;
+	}
+
+	public static void createKettleConfigurationDirectory(final KubernetesClient kubernetesClient,
+			final Deployment deployment) throws InterruptedException, IOException {
+		final String target = "/root/.kettle";
+		final String[] command = new String[] { "mkdir", "-p", target };
+		StaticUtils.execCommandOnDeployment(kubernetesClient, deployment, command, 15, null);
+	}
+
+	public static KettleIdeStatus createKettleIdeStatus(final KettleIdeStatus actualStatus,
+			final Deployment deployment) {
+		KettleIdeStatus status = actualStatus;
+		if (status == null) {
+			status = new KettleIdeStatus();
+		}
+		// TODO implementare logica
+		return status;
+	}
+
+	public static KettleJobStatus createKettleJobStatus(final KettleJobStatus actualStatus, final Job job) {
+		KettleJobStatus status = actualStatus;
+		if (status == null) {
+			status = new KettleJobStatus();
+		}
+		// TODO implementare logica
+		return status;
+	}
+
+	public static KettleRepositoryStatus createKettleRepositoryStatus(final KettleRepositoryStatus actualStatus,
+			final Deployment deployment) {
+		KettleRepositoryStatus status = actualStatus;
+		if (status == null) {
+			status = new KettleRepositoryStatus();
+		}
+		// TODO implementare logica
+		return status;
+	}
+
+	public static KettleTransformationStatus createKettleTransformationStatus(
+			final KettleTransformationStatus actualStatus, final Job job) {
+		KettleTransformationStatus status = actualStatus;
+		if (status == null) {
+			status = new KettleTransformationStatus();
+		}
+		// TODO implementare logica
+		return status;
+	}
+
+	public static List<String> createTransformationCommandArguments(final KettleTransformation kettleTransformation) {
+		final KettleTransformationSpec commandParameters = kettleTransformation.getSpec();
+		final List<String> list = new ArrayList<>();
+		final StringBuilder command = new StringBuilder();
+		addRepositoryCopy(command);
+		command.append(" " + BASE_COMMAND_DIRECTORY + "/pan.sh");
+		if (checkValidStringParameter(commandParameters.getDir())) {
+			command.append(" -dir='" + commandParameters.getDir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getExprep())) {
+			command.append(" -exprep='" + commandParameters.getExprep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getFile())) {
+			command.append(" -file='" + commandParameters.getFile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLevel())) {
+			command.append(" -level='" + commandParameters.getLevel() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListdir())) {
+			command.append(" -listdir='" + commandParameters.getListdir() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListrep())) {
+			command.append(" -listrep='" + commandParameters.getListrep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getListtrans())) {
+			command.append(" -listtrans='" + commandParameters.getListtrans() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getLogfile())) {
+			command.append(" -logfile='" + commandParameters.getLogfile() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getNorep())) {
+			command.append(" -norep='" + commandParameters.getNorep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getPass())) {
+			command.append(" -pass='" + commandParameters.getPass() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getRep())) {
+			command.append(" -rep='" + commandParameters.getRep() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getSafemode())) {
+			command.append(" -safemode='" + commandParameters.getSafemode() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getTrans())) {
+			command.append(" -trans='" + commandParameters.getTrans() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getUser())) {
+			command.append(" -user='" + commandParameters.getUser() + "'");
+		}
+		if (checkValidStringParameter(commandParameters.getVersion())) {
+			command.append(" -version='" + commandParameters.getVersion() + "'");
+		}
+		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
+			for (final String singleParam : commandParameters.getParam()) {
+				command.append(" -param:'" + singleParam + "'");
+			}
+		}
+		list.add(command.toString());
+		return list;
+	}
+
+	public static List<ExecResult> execCommandOnDeployment(final KubernetesClient kubernetesClient,
+			final Deployment deployment, final String[] command, final long timeoutCommandSeconds,
+			final String onlyOneTimePath) throws InterruptedException, IOException {
+		final List<ExecResult> result = new ArrayList<>();
+		final String namespace = deployment.getMetadata().getNamespace();
+		final String deploymentName = deployment.getMetadata().getName();
+		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace)
+				.withLabel(StaticUtils.LABEL_APP, deploymentName).list().getItems()) {
+			if (onlyOneTimePath == null
+					|| (!checkControlFile(kubernetesClient, namespace, pod.getMetadata().getName(), onlyOneTimePath))) {
+				result.add(execOnPod(kubernetesClient, namespace, pod.getMetadata().getName(), command,
+						timeoutCommandSeconds));
+				if (onlyOneTimePath != null) {
+					saveFileOnPod(kubernetesClient, createCheckFile(onlyOneTimePath), namespace,
+							createLocalTempFile(new Date().toString()), pod.getMetadata().getName());
+				}
+			}
+		}
+		return result;
+	}
+
+	public static String repositoriesManagement(final KubernetesClient kubernetesClient, final HasMetadata resource)
+			throws InterruptedException, IOException {
+		final MixedOperation<KettleRepository, KubernetesResourceList<KettleRepository>, Resource<KettleRepository>> repositoryClient = kubernetesClient
+				.resources(KettleRepository.class);
+		final StringBuilder sb = new StringBuilder();
+		sb.append(headerRepositories);
+		for (final KettleRepository kettleRepository : repositoryClient
+				.inNamespace(resource.getMetadata().getNamespace()).list().getItems()) {
+			addConnection(sb, kettleRepository);
+			addRepository(sb, kettleRepository);
+		}
+		sb.append(footerRepositories);
+		return sb.toString();
+	}
+
+	public static void saveStringToFileOnDeployment(final KubernetesClient kubernetesClient,
+			final Deployment deployment, final String payload, final String destinationFile) throws IOException {
+		final String namespace = deployment.getMetadata().getNamespace();
+		final String podName = deployment.getMetadata().getName();
+		final File tempFile = createLocalTempFile(payload);
+		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
+				.list().getItems()) {
+			saveFileOnPod(kubernetesClient, destinationFile, namespace, tempFile, pod.getMetadata().getName());
+		}
+		tempFile.delete();
+	}
 
 	private static void addConnection(final StringBuilder sb, final KettleRepository kettleRepository) {
 		sb.append("  <connection>\n");
@@ -249,333 +598,11 @@ public class StaticUtils {
 		return checkFile;
 	}
 
-	public static List<String> createCronJobCommandArguments(final CronKettleJob kettleJob) {
-		final CronKettleJobSpec commandParameters = kettleJob.getSpec();
-		final List<String> list = new ArrayList<>();
-		final StringBuilder command = new StringBuilder();
-		addRepositoryCopy(command);
-		command.append(" " + BASE_COMMAND_DIRECTORY + "/kitchen.sh");
-		if (checkValidStringParameter(commandParameters.getDir())) {
-			command.append(" -dir=" + commandParameters.getDir());
-		}
-		if (checkValidStringParameter(commandParameters.getExport())) {
-			command.append(" -export=" + commandParameters.getExport());
-		}
-		if (checkValidStringParameter(commandParameters.getFile())) {
-			command.append(" -file=" + commandParameters.getFile());
-		}
-		if (checkValidStringParameter(commandParameters.getJob())) {
-			command.append(" -job=" + commandParameters.getJob());
-		}
-		if (checkValidStringParameter(commandParameters.getLevel())) {
-			command.append(" -level=" + commandParameters.getLevel());
-		}
-		if (checkValidStringParameter(commandParameters.getListdir())) {
-			command.append(" -listdir=" + commandParameters.getListdir());
-		}
-		if (checkValidStringParameter(commandParameters.getListjob())) {
-			command.append(" -listjob=" + commandParameters.getListjob());
-		}
-		if (checkValidStringParameter(commandParameters.getListrep())) {
-			command.append(" -listrep=" + commandParameters.getListrep());
-		}
-		if (checkValidStringParameter(commandParameters.getLogfile())) {
-			command.append(" -logfile=" + commandParameters.getLogfile());
-		}
-		if (checkValidStringParameter(commandParameters.getNorep())) {
-			command.append(" -norep=" + commandParameters.getNorep());
-		}
-		if (checkValidStringParameter(commandParameters.getPass())) {
-			command.append(" -pass=" + commandParameters.getPass());
-		}
-		if (checkValidStringParameter(commandParameters.getRep())) {
-			command.append(" -rep=" + commandParameters.getRep());
-		}
-		if (checkValidStringParameter(commandParameters.getUser())) {
-			command.append(" -user=" + commandParameters.getUser());
-		}
-		if (checkValidStringParameter(commandParameters.getVersion())) {
-			command.append(" -version=" + commandParameters.getVersion());
-		}
-		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
-			for (final String singleParam : commandParameters.getParam()) {
-				command.append(" -param:" + singleParam);
-			}
-		}
-		list.add(command.toString());
-		return list;
-	}
-
-	public static CronKettleJobStatus createCronKettleJobStatus(final CronKettleJobStatus actualStatus,
-			final CronJob job) {
-		CronKettleJobStatus status = actualStatus;
-		if (status == null) {
-			status = new CronKettleJobStatus();
-		}
-		// TODO implementare logica
-		return status;
-	}
-
-	public static CronKettleTransformationStatus createCronKettleTransformationStatus(
-			final CronKettleTransformationStatus actualStatus, final CronJob job) {
-		CronKettleTransformationStatus status = actualStatus;
-		if (status == null) {
-			status = new CronKettleTransformationStatus();
-		}
-		// TODO implementare logica
-		return status;
-	}
-
-	public static List<String> createCronTransformationCommandArguments(
-			final CronKettleTransformation kettleTransformation) {
-		final CronKettleTransformationSpec commandParameters = kettleTransformation.getSpec();
-		final List<String> list = new ArrayList<>();
-		final StringBuilder command = new StringBuilder();
-		addRepositoryCopy(command);
-		command.append(" " + BASE_COMMAND_DIRECTORY + "/pan.sh");
-		if (checkValidStringParameter(commandParameters.getDir())) {
-			command.append(" -dir=" + commandParameters.getDir());
-		}
-		if (checkValidStringParameter(commandParameters.getExprep())) {
-			command.append(" -exprep=" + commandParameters.getExprep());
-		}
-		if (checkValidStringParameter(commandParameters.getFile())) {
-			command.append(" -file=" + commandParameters.getFile());
-		}
-		if (checkValidStringParameter(commandParameters.getLevel())) {
-			command.append(" -level=" + commandParameters.getLevel());
-		}
-		if (checkValidStringParameter(commandParameters.getListdir())) {
-			command.append(" -listdir=" + commandParameters.getListdir());
-		}
-		if (checkValidStringParameter(commandParameters.getListrep())) {
-			command.append(" -listrep=" + commandParameters.getListrep());
-		}
-		if (checkValidStringParameter(commandParameters.getListtrans())) {
-			command.append(" -listtrans=" + commandParameters.getListtrans());
-		}
-		if (checkValidStringParameter(commandParameters.getLogfile())) {
-			command.append(" -logfile=" + commandParameters.getLogfile());
-		}
-		if (checkValidStringParameter(commandParameters.getNorep())) {
-			command.append(" -norep=" + commandParameters.getNorep());
-		}
-		if (checkValidStringParameter(commandParameters.getPass())) {
-			command.append(" -pass=" + commandParameters.getPass());
-		}
-		if (checkValidStringParameter(commandParameters.getRep())) {
-			command.append(" -rep=" + commandParameters.getRep());
-		}
-		if (checkValidStringParameter(commandParameters.getSafemode())) {
-			command.append(" -safemode=" + commandParameters.getSafemode());
-		}
-		if (checkValidStringParameter(commandParameters.getTrans())) {
-			command.append(" -trans=" + commandParameters.getTrans());
-		}
-		if (checkValidStringParameter(commandParameters.getUser())) {
-			command.append(" -user=" + commandParameters.getUser());
-		}
-		if (checkValidStringParameter(commandParameters.getVersion())) {
-			command.append(" -version=" + commandParameters.getVersion());
-		}
-		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
-			for (final String singleParam : commandParameters.getParam()) {
-				command.append(" -param:" + singleParam);
-			}
-		}
-		list.add(command.toString());
-		return list;
-	}
-
-	public static List<String> createJobCommandArguments(final KettleJob kettleJob) {
-		final KettleJobSpec commandParameters = kettleJob.getSpec();
-		final List<String> list = new ArrayList<>();
-		final StringBuilder command = new StringBuilder();
-		addRepositoryCopy(command);
-		command.append(" " + BASE_COMMAND_DIRECTORY + "/kitchen.sh");
-		if (checkValidStringParameter(commandParameters.getDir())) {
-			command.append(" -dir=" + commandParameters.getDir());
-		}
-		if (checkValidStringParameter(commandParameters.getExport())) {
-			command.append(" -export=" + commandParameters.getExport());
-		}
-		if (checkValidStringParameter(commandParameters.getFile())) {
-			command.append(" -file=" + commandParameters.getFile());
-		}
-		if (checkValidStringParameter(commandParameters.getJob())) {
-			command.append(" -job=" + commandParameters.getJob());
-		}
-		if (checkValidStringParameter(commandParameters.getLevel())) {
-			command.append(" -level=" + commandParameters.getLevel());
-		}
-		if (checkValidStringParameter(commandParameters.getListdir())) {
-			command.append(" -listdir=" + commandParameters.getListdir());
-		}
-		if (checkValidStringParameter(commandParameters.getListjob())) {
-			command.append(" -listjob=" + commandParameters.getListjob());
-		}
-		if (checkValidStringParameter(commandParameters.getListrep())) {
-			command.append(" -listrep=" + commandParameters.getListrep());
-		}
-		if (checkValidStringParameter(commandParameters.getLogfile())) {
-			command.append(" -logfile=" + commandParameters.getLogfile());
-		}
-		if (checkValidStringParameter(commandParameters.getNorep())) {
-			command.append(" -norep=" + commandParameters.getNorep());
-		}
-		if (checkValidStringParameter(commandParameters.getPass())) {
-			command.append(" -pass=" + commandParameters.getPass());
-		}
-		if (checkValidStringParameter(commandParameters.getRep())) {
-			command.append(" -rep=" + commandParameters.getRep());
-		}
-		if (checkValidStringParameter(commandParameters.getUser())) {
-			command.append(" -user=" + commandParameters.getUser());
-		}
-		if (checkValidStringParameter(commandParameters.getVersion())) {
-			command.append(" -version=" + commandParameters.getVersion());
-		}
-		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
-			for (final String singleParam : commandParameters.getParam()) {
-				command.append(" -param:" + singleParam);
-			}
-		}
-		list.add(command.toString());
-		return list;
-	}
-
-	public static void createKettleConfigurationDirectory(final KubernetesClient kubernetesClient,
-			final Deployment deployment) throws InterruptedException, IOException {
-		final String target = "/root/.kettle";
-		final String[] command = new String[] { "mkdir", "-p", target };
-		StaticUtils.execCommandOnDeployment(kubernetesClient, deployment, command, 15, null);
-	}
-
-	public static KettleIdeStatus createKettleIdeStatus(final KettleIdeStatus actualStatus,
-			final Deployment deployment) {
-		KettleIdeStatus status = actualStatus;
-		if (status == null) {
-			status = new KettleIdeStatus();
-		}
-		// TODO implementare logica
-		return status;
-	}
-
-	public static KettleJobStatus createKettleJobStatus(final KettleJobStatus actualStatus, final Job job) {
-		KettleJobStatus status = actualStatus;
-		if (status == null) {
-			status = new KettleJobStatus();
-		}
-		// TODO implementare logica
-		return status;
-	}
-
-	public static KettleRepositoryStatus createKettleRepositoryStatus(final KettleRepositoryStatus actualStatus,
-			final Deployment deployment) {
-		KettleRepositoryStatus status = actualStatus;
-		if (status == null) {
-			status = new KettleRepositoryStatus();
-		}
-		// TODO implementare logica
-		return status;
-	}
-
-	public static KettleTransformationStatus createKettleTransformationStatus(
-			final KettleTransformationStatus actualStatus, final Job job) {
-		KettleTransformationStatus status = actualStatus;
-		if (status == null) {
-			status = new KettleTransformationStatus();
-		}
-		// TODO implementare logica
-		return status;
-	}
-
 	private static File createLocalTempFile(final String payload) throws IOException {
 		final File tempFile = new File("/tmp/" + UUID.randomUUID().toString());
 		Files.write(payload.getBytes(), tempFile);
 		tempFile.deleteOnExit();
 		return tempFile;
-	}
-
-	public static List<String> createTransformationCommandArguments(final KettleTransformation kettleTransformation) {
-		final KettleTransformationSpec commandParameters = kettleTransformation.getSpec();
-		final List<String> list = new ArrayList<>();
-		final StringBuilder command = new StringBuilder();
-		addRepositoryCopy(command);
-		command.append(" " + BASE_COMMAND_DIRECTORY + "/pan.sh");
-		if (checkValidStringParameter(commandParameters.getDir())) {
-			command.append(" -dir=" + commandParameters.getDir());
-		}
-		if (checkValidStringParameter(commandParameters.getExprep())) {
-			command.append(" -exprep=" + commandParameters.getExprep());
-		}
-		if (checkValidStringParameter(commandParameters.getFile())) {
-			command.append(" -file=" + commandParameters.getFile());
-		}
-		if (checkValidStringParameter(commandParameters.getLevel())) {
-			command.append(" -level=" + commandParameters.getLevel());
-		}
-		if (checkValidStringParameter(commandParameters.getListdir())) {
-			command.append(" -listdir=" + commandParameters.getListdir());
-		}
-		if (checkValidStringParameter(commandParameters.getListrep())) {
-			command.append(" -listrep=" + commandParameters.getListrep());
-		}
-		if (checkValidStringParameter(commandParameters.getListtrans())) {
-			command.append(" -listtrans=" + commandParameters.getListtrans());
-		}
-		if (checkValidStringParameter(commandParameters.getLogfile())) {
-			command.append(" -logfile=" + commandParameters.getLogfile());
-		}
-		if (checkValidStringParameter(commandParameters.getNorep())) {
-			command.append(" -norep=" + commandParameters.getNorep());
-		}
-		if (checkValidStringParameter(commandParameters.getPass())) {
-			command.append(" -pass=" + commandParameters.getPass());
-		}
-		if (checkValidStringParameter(commandParameters.getRep())) {
-			command.append(" -rep=" + commandParameters.getRep());
-		}
-		if (checkValidStringParameter(commandParameters.getSafemode())) {
-			command.append(" -safemode=" + commandParameters.getSafemode());
-		}
-		if (checkValidStringParameter(commandParameters.getTrans())) {
-			command.append(" -trans=" + commandParameters.getTrans());
-		}
-		if (checkValidStringParameter(commandParameters.getUser())) {
-			command.append(" -user=" + commandParameters.getUser());
-		}
-		if (checkValidStringParameter(commandParameters.getVersion())) {
-			command.append(" -version=" + commandParameters.getVersion());
-		}
-		if (commandParameters.getParam() != null && commandParameters.getParam().length > 0) {
-			for (final String singleParam : commandParameters.getParam()) {
-				command.append(" -param:" + singleParam);
-			}
-		}
-		list.add(command.toString());
-		return list;
-	}
-
-	public static List<ExecResult> execCommandOnDeployment(final KubernetesClient kubernetesClient,
-			final Deployment deployment, final String[] command, final long timeoutCommandSeconds,
-			final String onlyOneTimePath) throws InterruptedException, IOException {
-		final List<ExecResult> result = new ArrayList<>();
-		final String namespace = deployment.getMetadata().getNamespace();
-		final String deploymentName = deployment.getMetadata().getName();
-		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace)
-				.withLabel(StaticUtils.LABEL_APP, deploymentName).list().getItems()) {
-			if (onlyOneTimePath == null
-					|| (!checkControlFile(kubernetesClient, namespace, pod.getMetadata().getName(), onlyOneTimePath))) {
-				result.add(execOnPod(kubernetesClient, namespace, pod.getMetadata().getName(), command,
-						timeoutCommandSeconds));
-				if (onlyOneTimePath != null) {
-					saveFileOnPod(kubernetesClient, createCheckFile(onlyOneTimePath), namespace,
-							createLocalTempFile(new Date().toString()), pod.getMetadata().getName());
-				}
-			}
-		}
-		return result;
 	}
 
 	private static ExecResult execOnPod(final KubernetesClient kubernetesClient, final String namespace,
@@ -605,38 +632,11 @@ public class StaticUtils {
 		return new ExecResult(command, output, error);
 	}
 
-	public static String repositoriesManagement(final KubernetesClient kubernetesClient, final HasMetadata resource)
-			throws InterruptedException, IOException {
-		final MixedOperation<KettleRepository, KubernetesResourceList<KettleRepository>, Resource<KettleRepository>> repositoryClient = kubernetesClient
-				.resources(KettleRepository.class);
-		final StringBuilder sb = new StringBuilder();
-		sb.append(headerRepositories);
-		for (final KettleRepository kettleRepository : repositoryClient
-				.inNamespace(resource.getMetadata().getNamespace()).list().getItems()) {
-			addConnection(sb, kettleRepository);
-			addRepository(sb, kettleRepository);
-		}
-		sb.append(footerRepositories);
-		return sb.toString();
-	}
-
 	private static void saveFileOnPod(final KubernetesClient kubernetesClient, final String destinationFile,
 			final String namespace, final File tempFile, final String podNameSelected) {
 		logger.fine("pod " + podNameSelected + " in namespace " + namespace);
 		kubernetesClient.pods().inNamespace(namespace).withName(podNameSelected).file(destinationFile)
 				.upload(tempFile.toPath());
-	}
-
-	public static void saveStringToFileOnDeployment(final KubernetesClient kubernetesClient,
-			final Deployment deployment, final String payload, final String destinationFile) throws IOException {
-		final String namespace = deployment.getMetadata().getNamespace();
-		final String podName = deployment.getMetadata().getName();
-		final File tempFile = createLocalTempFile(payload);
-		for (final Pod pod : kubernetesClient.pods().inNamespace(namespace).withLabel(StaticUtils.LABEL_APP, podName)
-				.list().getItems()) {
-			saveFileOnPod(kubernetesClient, destinationFile, namespace, tempFile, pod.getMetadata().getName());
-		}
-		tempFile.delete();
 	}
 
 	private StaticUtils() {
