@@ -23,6 +23,11 @@ Repository
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/repository.yaml
 ```
 
+Dump repository datas example
+```
+kubectl -n test-namespace exec -ti repository-example1-5cfb665b55-7mh5t -- sh -c "pg_dump -U rossonet kettle | gzip > /tmp/kettle.sql.gz" && kubectl -n test-namespace cp repository-example1-5cfb665b55-7mh5t:/tmp/kettle.sql.gz ./kubernetes/examples/support_data/kettle.sql.gz
+```
+
 Spoon Kettle IDE
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/spoon-ide.yaml
