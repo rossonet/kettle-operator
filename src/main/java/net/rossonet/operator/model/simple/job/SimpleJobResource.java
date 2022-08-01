@@ -50,7 +50,8 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 			final Container container = new Container();
 			container.setName(jobName);
 			container.setImage(kettleJob.getSpec().getImage());
-			container.setCommand(StaticUtils.createJobCommand(kettleJob));
+			container.setCommand(Arrays.asList(new String[] { "/bin/sh", "-c" }));
+			container.setArgs(StaticUtils.createJobCommandArguments(kettleJob));
 			final List<VolumeMount> volumesList = new ArrayList<>();
 			final List<Volume> volumes = new ArrayList<>();
 			final Volume volume = new Volume();
@@ -67,7 +68,8 @@ public class SimpleJobResource extends CRUKubernetesDependentResource<Job, Kettl
 			volumes.add(volume);
 			podSpec.setVolumes(volumes);
 			final VolumeMount volumeRepositories = new VolumeMount();
-			volumeRepositories.setMountPath("/root/.kettle");
+			// volumeRepositories.setMountPath("/root/.kettle");
+			volumeRepositories.setMountPath("/data");
 			volumeRepositories.setReadOnly(false);
 			volumeRepositories.setName(StaticUtils.REPOSITORIES_VOLUME_NAME);
 			volumesList.add(volumeRepositories);

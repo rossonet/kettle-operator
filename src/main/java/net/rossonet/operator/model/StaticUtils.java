@@ -217,6 +217,17 @@ public class StaticUtils {
 
 	}
 
+	private static void addRepositoryCopy(final List<String> command) {
+		command.add("mkdir");
+		command.add("-p");
+		command.add("/root/.kettle");
+		command.add(";");
+		command.add("cp");
+		command.add("/data/repositories.xml");
+		command.add("/root/.kettle/repositories.xml");
+		command.add(";");
+	}
+
 	private static boolean checkControlFile(final KubernetesClient kubernetesClient, final String namespace,
 			final String podName, final String onlyOneTimePath) throws IOException, InterruptedException {
 		final String destinationFile = onlyOneTimePath + "_script.sh";
@@ -238,9 +249,10 @@ public class StaticUtils {
 		return checkFile;
 	}
 
-	public static List<String> createCronJobCommand(final CronKettleJob kettleJob) {
+	public static List<String> createCronJobCommandArguments(final CronKettleJob kettleJob) {
 		final CronKettleJobSpec commandParameters = kettleJob.getSpec();
 		final List<String> command = new ArrayList<>();
+		addRepositoryCopy(command);
 		command.add(BASE_COMMAND_DIRECTORY + "/kitchen.sh");
 		if (checkValidStringParameter(commandParameters.getDir())) {
 			command.add("-dir=" + commandParameters.getDir());
@@ -312,9 +324,10 @@ public class StaticUtils {
 		return status;
 	}
 
-	public static List<String> createCronTransformationCommand(final CronKettleTransformation kettleTransformation) {
+	public static List<String> createCronTransformationCommandArguments(final CronKettleTransformation kettleTransformation) {
 		final CronKettleTransformationSpec commandParameters = kettleTransformation.getSpec();
 		final List<String> command = new ArrayList<>();
+		addRepositoryCopy(command);
 		command.add(BASE_COMMAND_DIRECTORY + "/pan.sh");
 		if (checkValidStringParameter(commandParameters.getDir())) {
 			command.add("-dir=" + commandParameters.getDir());
@@ -369,9 +382,10 @@ public class StaticUtils {
 		return command;
 	}
 
-	public static List<String> createJobCommand(final KettleJob kettleJob) {
+	public static List<String> createJobCommandArguments(final KettleJob kettleJob) {
 		final KettleJobSpec commandParameters = kettleJob.getSpec();
 		final List<String> command = new ArrayList<>();
+		addRepositoryCopy(command);
 		command.add(BASE_COMMAND_DIRECTORY + "/kitchen.sh");
 		if (checkValidStringParameter(commandParameters.getDir())) {
 			command.add("-dir=" + commandParameters.getDir());
@@ -476,9 +490,10 @@ public class StaticUtils {
 		return tempFile;
 	}
 
-	public static List<String> createTransformationCommand(final KettleTransformation kettleTransformation) {
+	public static List<String> createTransformationCommandArguments(final KettleTransformation kettleTransformation) {
 		final KettleTransformationSpec commandParameters = kettleTransformation.getSpec();
 		final List<String> command = new ArrayList<>();
+		addRepositoryCopy(command);
 		command.add(BASE_COMMAND_DIRECTORY + "/pan.sh");
 		if (checkValidStringParameter(commandParameters.getDir())) {
 			command.add("-dir=" + commandParameters.getDir());
