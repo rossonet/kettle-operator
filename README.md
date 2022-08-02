@@ -50,7 +50,7 @@ kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/cron_transformation.yaml
 ```
 
-[Periodical Job kind example](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/cron_job.yaml)
+[Periodical Job kind example (cron kettle job)](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/cron_job.yaml)
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/cron_job.yaml
 ```
@@ -67,6 +67,7 @@ kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main
 
 [examples](https://github.com/java-operator-sdk/java-operator-sdk/tree/main/sample-operators)
 
+### Project sponsor 
 
 ![alt text](https://app.rossonet.net/wp-content/uploads/2021/10/rossonet-logo_280_115.png "Rossonet")
 
