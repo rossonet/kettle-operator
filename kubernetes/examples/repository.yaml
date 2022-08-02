@@ -5,9 +5,9 @@ metadata:
   namespace: test-namespace
 spec:
   #image: "rossonet/kettle-repository:latest" # docker image default is https://hub.docker.com/r/rossonet/kettle-repository
-  repositoryUrl: "https://www.rossonet.net/dati/pdi/repository/kettle.sql.gz" # repository url to get the data. Should start with the protocol 'git-ssh://', 'git-http://', 'git-https://', 's3://','ftp://', 'http://', 'https://' or 'file://'. If the file name terminate with .sql.gz the appropiate decompression is applied
-  username: "rossonet" # Database username
-  password: "password1" # Database password
+  repositoryUrl: "https://github.com/rossonet/kettle-operator/raw/main/kubernetes/examples/support_data/kettle.sql.gz" # repository url to get the data. Should start with the protocol 'git-ssh://', 'git-http://', 'git-https://', 's3://','ftp://', 'http://', 'https://' or 'file://'. If the file name terminate with .sql.gz the appropiate decompression is applied
+  #username: "rossonet" # Database username
+  #password: "password1" # Database password
   databaseName: "kettle" # Database name
   replicas: 1 # Number of database pods
   repositoryUsername: "kettle_user" # username to get the database dump from repository

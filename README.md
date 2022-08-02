@@ -18,27 +18,33 @@ kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main
 
 ### Examples
 
-Repository
+[Repository kind example](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/repository.yaml)
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/repository.yaml
 ```
 
 Dump repository datas example
 ```
-kubectl -n test-namespace exec -ti repository-example1-5cfb665b55-7mh5t -- sh -c "pg_dump -U rossonet kettle | gzip > /tmp/kettle.sql.gz" && kubectl -n test-namespace cp repository-example1-5cfb665b55-7mh5t:/tmp/kettle.sql.gz ./kubernetes/examples/support_data/kettle.sql.gz
+REPOSITORY_POD_NAME=<insert the pod name here>
+kubectl -n test-namespace exec -ti $REPOSITORY_POD_NAME -- sh -c "pg_dump -U rossonet kettle | gzip > /tmp/kettle.sql.gz" && kubectl -n test-namespace cp $REPOSITORY_POD_NAME:/tmp/kettle.sql.gz ./kubernetes/examples/support_data/kettle.sql.gz
 ```
 
-Spoon Kettle IDE
+[Spoon Kettle IDE kind example](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/spoon-ide.yaml)
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/spoon-ide.yaml
 ```
 
-Transformation Job
+[Transformation kind example](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/transformation.yaml)
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/transformation.yaml
 ```
 
-### Framework Java to make Kubernetes Operators
+[Job kind example](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/job.yaml)
+```
+kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/job.yaml
+```
+
+### Framework Java used to create the Kubernetes Operator
 
 [https://javaoperatorsdk.io/](https://javaoperatorsdk.io/)
 
