@@ -1,6 +1,7 @@
 # Pentaho Kettle Operator by Rossonet
 
 ## Kubernetes Kettle Operator
+
 [![Test on master branch with Gradle](https://github.com/rossonet/kettle-operator/actions/workflows/test-on-master-with-gradle.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/test-on-master-with-gradle.yml)
 [![Build and publish docker image of Operator to DockerHub](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-operator.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-operator.yml)
 [![Build and publish docker images of runner components to DockerHub](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-runners.yml/badge.svg)](https://github.com/rossonet/kettle-operator/actions/workflows/publish-to-dockerhub-runners.yml)
@@ -43,6 +44,22 @@ kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main
 ```
 kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/job.yaml
 ```
+
+[Periodical Transformation kind example (cron transformation)](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/cron_transformation.yaml)
+```
+kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/cron_transformation.yaml
+```
+
+[Periodical Job kind example](https://github.com/rossonet/kettle-operator/blob/main/kubernetes/examples/cron_job.yaml)
+```
+kubectl apply -f https://raw.githubusercontent.com/rossonet/kettle-operator/main/kubernetes/examples/cron_job.yaml
+```
+
+## Thanks to...
+
+### Pentaho Kettle source code
+
+[Pentaho Kettle repository](https://github.com/pentaho/pentaho-kettle)
 
 ### Framework Java used to create the Kubernetes Operator
 
