@@ -11,7 +11,6 @@ public class CronKettleJobSpec {
 	 * The repository directory that contains the job, including the leading slash
 	 */
 	@JsonPropertyDescription("The repository directory that contains the job, including the leading slash")
-	@NotNull
 	private String dir = null;
 
 	/**

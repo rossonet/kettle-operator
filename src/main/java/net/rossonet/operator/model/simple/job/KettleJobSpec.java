@@ -1,7 +1,5 @@
 package net.rossonet.operator.model.simple.job;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import net.rossonet.operator.model.KettleWork;
@@ -11,7 +9,6 @@ public class KettleJobSpec {
 	 * The repository directory that contains the job, including the leading slash
 	 */
 	@JsonPropertyDescription("The repository directory that contains the job, including the leading slash")
-	@NotNull
 	private String dir = null;
 	/**
 	 * If you are calling a local KJB file, this is the filename, including the path

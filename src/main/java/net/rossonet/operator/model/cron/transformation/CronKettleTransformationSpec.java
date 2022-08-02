@@ -15,7 +15,6 @@ public class CronKettleTransformationSpec {
 	 * leading slash
 	 */
 	@JsonPropertyDescription("The repository directory that contains the transformation, including the leading slash")
-	@NotNull
 	private String dir = null;
 
 	/** Exports all repository objects to one XML file */

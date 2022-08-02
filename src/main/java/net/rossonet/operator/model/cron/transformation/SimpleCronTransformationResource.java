@@ -12,10 +12,12 @@ import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.KeyToPath;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PodSpec;
+import io.fabric8.kubernetes.api.model.PodTemplateSpec;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJob;
 import io.fabric8.kubernetes.api.model.batch.v1.CronJobSpec;
+import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.fabric8.kubernetes.api.model.batch.v1.JobTemplateSpec;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUKubernetesDependentResource;
@@ -84,7 +86,11 @@ public class SimpleCronTransformationResource
 			template.getMetadata().setLabels(labels);
 			spec.setJobTemplate(template);
 			job.setSpec(spec);
+			job.getSpec().getJobTemplate().setSpec(new JobSpec());
+			job.getSpec().getJobTemplate().getSpec().setTemplate(new PodTemplateSpec());
 			job.getSpec().getJobTemplate().getSpec().getTemplate().setSpec(podSpec);
+			job.getSpec().getJobTemplate().getSpec().getTemplate().setMetadata(new ObjectMeta());
+			job.getSpec().getJobTemplate().getSpec().getTemplate().getMetadata().setLabels(labels);
 			job.getSpec().setSchedule(kettleTransformation.getSpec().getSchedule());
 			logger.info("actual cronjob " + job);
 		} catch (final Exception e) {
