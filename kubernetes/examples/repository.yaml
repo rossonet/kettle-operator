@@ -10,6 +10,6 @@ spec:
   #password: "password1" # Database password
   databaseName: "kettle" # Database name
   replicas: 1 # Number of database pods
-  repositoryUsername: "kettle_user" # username to get the database dump from repository
-  repositoryPassword: "password1" # password to get the database dump from repository
+  #repositoryUsername: "kettle_user" # username to get the database dump from repository
+  #repositoryPassword: "password1" # password to get the database dump from repository
   # repositorySshCertificate: ... # ssh certicate to get the database dump from git
