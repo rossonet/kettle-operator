@@ -1,4 +1,5 @@
 FROM dorowu/ubuntu-desktop-lxde-vnc:focal
+ARG MAINTAINER="Andrea Ambrosini <andrea.ambrosini@rossonet.org>"
 RUN echo "deb http://cz.archive.ubuntu.com/ubuntu bionic main universe" >> /etc/apt/sources.list
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jre bash gawk sed grep bc coreutils wget binutils unzip libwebkitgtk-1.0-0 && apt-get clean && rm -rf /var/lib/apt/lists/*

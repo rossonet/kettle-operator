@@ -6,6 +6,7 @@ RUN chmod +x gradlew
 RUN ./gradlew clean shadowJar
 
 FROM ubuntu:20.04
+ARG MAINTAINER="Andrea Ambrosini <andrea.ambrosini@rossonet.org>"
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jre bash gawk sed grep bc coreutils wget binutils nmap && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENTRYPOINT ["java"]
 CMD ["-XX:+UnlockExperimentalVMOptions","-Djava.net.preferIPv4Stack=true","-XshowSettings:vm","-Djava.security.egd=file:/dev/./urandom","-jar","/operator.jar"]

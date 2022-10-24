@@ -1,4 +1,5 @@
 FROM ubuntu:20.04
+ARG MAINTAINER="Andrea Ambrosini <andrea.ambrosini@rossonet.org>"
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jre bash gawk sed grep bc coreutils wget binutils unzip nmap && apt-get clean && rm -rf /var/lib/apt/lists/*
 WORKDIR /
 RUN wget --no-check-certificate https://www.rossonet.net/dati/pdi/pdi-ce-9.3.0.0-428.zip -O pdi.zip && \
