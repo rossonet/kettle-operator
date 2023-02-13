@@ -38,8 +38,8 @@ repositories {
 }
 
 dependencies {
-  implementation group: 'io.javaoperatorsdk', name: 'operator-framework', version: '3.0.3'
-  annotationProcessor "io.javaoperatorsdk:operator-framework:3.0.3"
+  implementation group: 'io.javaoperatorsdk', name: 'operator-framework', version: '4.2.7'
+  annotationProcessor "io.javaoperatorsdk:operator-framework:4.2.7"
   annotationProcessor 'io.fabric8:crd-generator-apt:5.12.2'
   implementation 'org.apache.commons:commons-compress:1.21' // per passaggio file tramite API k8s
   implementation 'org.takes:takes:1.24.4'
